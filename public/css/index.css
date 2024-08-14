@@ -1,0 +1,21 @@
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+#loading-bar {
+  position: absolute;
+  top: calc(50% - 1px);
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  transform: scale(0);
+  transform-origin: center left;
+  transition: transform 0.5s;
+  will-change: transform; /* 渲染性能优化 */
+}
+
+#loading-bar.ended {
+  transform-origin: center right;
+  transition: transform 1.5s ease-in-out;
+}
