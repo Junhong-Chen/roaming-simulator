@@ -2,11 +2,11 @@ import { AmbientLight, DirectionalLight } from "three"
 
 export default class Light {
 
-  constructor(world) {
+  constructor(view) {
     const aLight = this.ambientLight()
     const dLight = this.directionalLight()
 
-    world.scene.add(aLight, dLight)
+    view.scene.add(aLight, dLight)
   }
 
   ambientLight() {

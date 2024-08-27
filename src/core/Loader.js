@@ -1,8 +1,8 @@
 import { TextureLoader } from "three"
 import { GLTFLoader } from "three/examples/jsm/Addons.js"
 import { DRACOLoader } from "three/examples/jsm/Addons.js"
-import EventEmitter from "./eventEmitter"
-import Loading from "./loading"
+import EventEmitter from "./EventEmitter"
+import Loading from "../utils/Loading"
 
 export default class Loader extends EventEmitter {
   #loaders = {}

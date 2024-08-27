@@ -14,7 +14,7 @@ export default class Music {
 
   init() {
     const autoPlay = () => {
-      this.#audio = new Audio('/audio/music.mp3')
+      this.#audio = new Audio('/sounds/music.mp3')
       this.#audio.setAttribute('loop', true)
   
       const audioCtx = new window.AudioContext()

@@ -1,7 +1,7 @@
-import { Clock } from "three"
-import EventEmitter from "./eventEmitter"
+import { Clock as TCLock } from "three"
+import EventEmitter from "./EventEmitter"
 
-export default class Time extends EventEmitter {
+export default class Clock extends EventEmitter {
   #id
   #clock
 
@@ -12,10 +12,11 @@ export default class Time extends EventEmitter {
   get elapsed() {
     return this.#clock.elapsedTime
   }
+
   constructor() {
     super()
 
-    this.#clock = new Clock()
+    this.#clock = new TCLock()
     this.animate()
   }
 

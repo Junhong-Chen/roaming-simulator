@@ -1,6 +1,6 @@
-import EventEmitter from "./eventEmitter"
+import EventEmitter from "../core/EventEmitter"
 
-export default class Sizes extends EventEmitter {
+export default class Viewport extends EventEmitter {
   #width
   #height
   #pixelRatio
