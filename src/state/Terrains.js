@@ -11,8 +11,10 @@ export default class Terrains extends EventEmitter {
   static ITERATIONS_FORMULA_MIX = 3
   static ITERATIONS_FORMULA_POWERMIX = 4
 
-  constructor() {
+  constructor(state) {
     super()
+
+    this.state = state
 
     this.seed = 'CJ'
     this.random = new seedrandom(this.seed)
@@ -135,10 +137,10 @@ export default class Terrains extends EventEmitter {
   }
 
   setDebug() {
-    if (!Debugger.gui)
+    if (!this.state.debug.gui)
       return
 
-    const folder = Debugger.gui.getFolder('state/terrains')
+    const folder = this.state.debug.getFolder('state/terrains')
 
     folder
       .add(this, 'subdivisions')

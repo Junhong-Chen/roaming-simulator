@@ -8,6 +8,7 @@ import Chunks from "./Chunks"
 
 export default class State {
   constructor(app) {
+    this.debug = app.debug
     this.clock = app.clock
     this.viewport = app.viewport
 
@@ -15,7 +16,7 @@ export default class State {
     this.day = new Day(this)
     this.sun = new Sun(this)
     this.player = new Player(this)
-    this.terrains = new Terrains()
+    this.terrains = new Terrains(this)
     this.chunks = new Chunks(this)
   }
 

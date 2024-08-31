@@ -7,7 +7,8 @@ import Chunks from "./Chunks"
 
 export default class View {
   constructor(app) {
-    this.app = app
+    this.renderer = app.renderer
+    this.debug = app.debug
     this.music = app.music
     this.viewport = app.viewport
     this.clock = app.clock

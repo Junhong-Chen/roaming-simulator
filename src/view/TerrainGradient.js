@@ -2,22 +2,23 @@ import { Texture } from "three"
 import Debugger from "../utils/Debugger"
 
 export default class TerrainGradient {
-  constructor() {
+  constructor(view) {
+    this.view = view
 
     this.canvas = document.createElement('canvas')
     this.context = this.canvas.getContext('2d')
     this.texture = new Texture(this.canvas)
 
     this.colors = {
-      aboveFar: '#ffffff',
-      aboveClose: '#a6c33c',
-      belowClose: '#2f3d36',
-      belowFar: '#011018',
+      // aboveFar: '#ffffff',
+      // aboveClose: '#a6c33c',
+      // belowClose: '#2f3d36',
+      // belowFar: '#011018',
 
-      // aboveFar: '#f4e5ff',
-      // aboveClose: '#5900ff',
-      // belowClose: '#0d0061',
-      // belowFar: '#003242',
+      aboveFar: '#f4e5ff',
+      aboveClose: '#5900ff',
+      belowClose: '#0d0061',
+      belowFar: '#003242',
     }
 
     this.width = 1
@@ -50,10 +51,11 @@ export default class TerrainGradient {
   }
 
   setDebug() {
-    if (!Debugger.gui)
+    const debug = this.view.debug
+    if (!debug.gui)
       return
 
-    const folder = Debugger.gui.getFolder('view/terrains/gradient')
+    const folder = debug.getFolder('view/terrains/gradient')
 
     for (const colorKey in this.colors) {
       folder

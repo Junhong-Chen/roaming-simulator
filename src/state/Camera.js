@@ -1,5 +1,4 @@
 import { vec3, quat2, mat4 } from "gl-matrix"
-import Debugger from "../utils/Debugger.js"
 
 export default class Camera {
   static MODE_THIRDPERSON = 1
@@ -55,10 +54,11 @@ export default class Camera {
   }
 
   setDebug() {
-    if (!Debugger.gui)
+    const debug = this.state.debug
+    if (!debug.gui)
       return
 
-    const folder = Debugger.gui.getFolder('state/player/view')
+    const folder = debug.getFolder('state/player/view')
 
     folder
       .add(

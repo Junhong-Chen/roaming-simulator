@@ -22,10 +22,11 @@ export default class Day {
   }
 
   setDebug() {
-    if (!Debugger.gui)
+    const debug = this.state.debug
+    if (!debug.gui)
       return
 
-    const folder = Debugger.gui.getFolder('state/dayCycle')
+    const folder = debug.getFolder('state/dayCycle')
 
     folder
       .add(this, 'autoUpdate')

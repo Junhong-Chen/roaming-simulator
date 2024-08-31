@@ -1,28 +1,27 @@
 import GUI from 'lil-gui'
 
 export default class Debugger {
+  #gui
 
-  static gui
-
-  constructor() {
-    this.tree = {}
-    this.tree.folder = this.instance
-    this.tree.children = {}
-
-    this.init()
+  get gui() {
+    return this.#gui
   }
 
-  init() {
+  constructor() {
     this.hashChange() // first loaded
     window.addEventListener('hashchange', this.hashChange, false)
+
+    this.tree = {}
+    this.tree.folder = this.#gui
+    this.tree.children = {}
   }
 
   hashChange = () => {
     if (location.hash.includes('debug')) {
-      Debugger.gui = new GUI({ title: 'debug' })
-    } else if (Debugger.gui) {
-      Debugger.gui.destroy()
-      Debugger.gui = null
+      this.#gui = new GUI({ title: 'debug' })
+    } else if (this.#gui) {
+      this.#gui.destroy()
+      this.#gui = null
     }
   }
 

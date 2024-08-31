@@ -23,7 +23,7 @@ export default class Terrains {
   }
 
   setGradient() {
-    this.gradient = new TerrainGradient()
+    this.gradient = new TerrainGradient(this.view)
   }
 
   setMaterial() {
@@ -54,10 +54,11 @@ export default class Terrains {
   }
 
   setDebug() {
-    if (!Debugger.gui)
+    const debug = this.view.debug
+    if (!debug.gui)
       return
 
-    const folder = Debugger.gui.getFolder('view/terrains')
+    const folder = debug.getFolder('view/terrains')
 
     folder
       .add(this.material, 'wireframe')

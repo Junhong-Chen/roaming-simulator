@@ -13,16 +13,16 @@ export default class App {
   constructor() { }
 
   init() {
-    this.debugger = new Debugger()
+    this.debug = new Debugger()
     this.music = new Music()
     this.scene = new Scene()
     this.viewport = new Viewport()
     this.clock = new Clock()
     this.loader = new Loader(sources, this.scene)
     this.state = new State(this)
-    
-    this.view = new View(this)
     this.renderer = new Renderer()
+
+    this.view = new View(this)
     
     this.resize()
     this.viewport.on('resize', this.resize)
@@ -50,7 +50,7 @@ export default class App {
     // e.preventDefault()
     this.viewport.off('resize')
     this.clock.off('tick')
-    this.debugger.destroy()
+    this.debug.destroy()
     this.viewport.destroy()
     this.clock.destroy()
     this.renderer.destroy()
