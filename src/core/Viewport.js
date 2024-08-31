@@ -1,4 +1,4 @@
-import EventEmitter from "../core/EventEmitter"
+import EventEmitter from "./EventEmitter"
 
 export default class Viewport extends EventEmitter {
   #width
@@ -15,8 +15,11 @@ export default class Viewport extends EventEmitter {
     return this.#pixelRatio
   }
 
-  constructor() {
+  constructor(state) {
     super()
+
+    this.smallestSide = null
+    this.biggestSide = null
 
     this.updateSize()
 
@@ -27,11 +30,21 @@ export default class Viewport extends EventEmitter {
     this.#width = window.innerWidth
     this.#height = window.innerHeight
     this.#pixelRatio = Math.min(window.devicePixelRatio, 2)
+    this.smallestSide = this.width < this.height ? this.width : this.height
+    this.biggestSide = this.width > this.height ? this.width : this.height
   }
 
   resize = () => {
     this.updateSize()
     this.emit('resize')
+  }
+
+  normalise(pixelCoordinates) {
+    const minSize = Math.min(this.#width, this.#height)
+    return {
+      x: pixelCoordinates.x / minSize,
+      y: pixelCoordinates.y / minSize,
+    }
   }
 
   destroy() {

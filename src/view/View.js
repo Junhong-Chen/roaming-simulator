@@ -1,23 +1,24 @@
+import Camera from "./Camera"
 import Light from "./Light"
-import Floor from "./Floor"
 import Player from "./Player"
+import Sky from "./Sky"
 import Terrains from "./Terrains"
+import Chunks from "./Chunks"
 
 export default class View {
   constructor(app) {
-    this.scene = app.scene
-    this.clock = app.clock
+    this.app = app
     this.music = app.music
+    this.viewport = app.viewport
+    this.clock = app.clock
+    this.scene = app.scene
+    this.state = app.state
 
-    this.resources
-
-    this.init()
-  }
-
-  init() {
+    this.camera = new Camera(this)
     this.light = new Light(this)
-    // this.floor = new Floor(this)
-    this.terrains = new Terrains()
+    this.sky = new Sky(this)
+    this.terrains = new Terrains(this)
+    // this.chunks = new Chunks(this)
   }
 
   load(resources) {
@@ -25,8 +26,11 @@ export default class View {
   }
 
   update(deltaTime, elapsedTime) {
+    this.camera.update()
+    this.sky.update()
+    this.terrains.update()
+    // this.chunks.update()
     if (this.player) this.player.update(deltaTime, elapsedTime)
-    this.floor.update(deltaTime, elapsedTime)
   }
 
   destroy() {

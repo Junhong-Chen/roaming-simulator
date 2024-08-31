@@ -9,7 +9,7 @@ export default class Music {
   }
 
   constructor() {
-    this.init()
+    // this.init()
   }
 
   init() {

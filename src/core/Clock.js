@@ -5,10 +5,6 @@ export default class Clock extends EventEmitter {
   #id
   #clock
 
-  get delta() {
-    return this.#clock.getDelta()
-  }
-
   get elapsed() {
     return this.#clock.elapsedTime
   }
@@ -21,10 +17,10 @@ export default class Clock extends EventEmitter {
   }
 
   animate() {
-    const deltaTime = this.#clock.getDelta()
+    this.delta = this.#clock.getDelta()
     this.#id = window.requestAnimationFrame(this.animate.bind(this))
 
-    this.emit('tick', { deltaTime, elapsedTime: this.#clock.elapsedTime })
+    this.emit('tick', { deltaTime: this.delta, elapsedTime: this.#clock.elapsedTime })
   }
 
   destroy() {
