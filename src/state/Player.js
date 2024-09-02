@@ -24,7 +24,7 @@ export default class Player extends EventEmitter {
     this.speed = 0
 
     this.position = {}
-    this.position.current = vec3.fromValues(10, 0, 1)
+    this.position.current = vec3.fromValues(0, 0, 0)
     this.position.previous = vec3.clone(this.position.current)
     this.position.delta = vec3.create()
 

@@ -43,10 +43,6 @@ export default class Controls extends EventEmitter {
         name: 'boost'
       },
       {
-        codes: ['KeyP'],
-        name: 'pointerLock'
-      },
-      {
         codes: ['KeyV'],
         name: 'cameraMode'
       },

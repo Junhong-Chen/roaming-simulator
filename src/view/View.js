@@ -3,7 +3,7 @@ import Light from "./Light"
 import Player from "./Player"
 import Sky from "./Sky"
 import Terrains from "./Terrains"
-import Chunks from "./Chunks"
+import { Mesh, MeshStandardMaterial, Plane, PlaneGeometry, ShaderMaterial, Uniform } from "three"
 
 export default class View {
   constructor(app) {
@@ -16,22 +16,23 @@ export default class View {
     this.state = app.state
 
     this.camera = new Camera(this)
+    this.player = new Player(this)
     this.light = new Light(this)
     this.sky = new Sky(this)
     this.terrains = new Terrains(this)
-    // this.chunks = new Chunks(this)
   }
 
   load(resources) {
-    this.player = new Player(this, resources)
+    this.player.load(resources)
+    this.light.playerLight.target = this.player.model
   }
 
   update(deltaTime, elapsedTime) {
     this.camera.update()
+    this.light.update()
     this.sky.update()
     this.terrains.update()
-    // this.chunks.update()
-    if (this.player) this.player.update(deltaTime, elapsedTime)
+    this.player.update(deltaTime)
   }
 
   destroy() {

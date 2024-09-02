@@ -1,5 +1,4 @@
 import { BackSide, BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, PlaneGeometry, Points, Scene, SphereGeometry, Vector3, WebGLRenderTarget, Group } from "three"
-import Debugger from "../utils/Debugger.js"
 
 import SkyBackgroundMaterial from '../materials/SkyBackgroundMaterial.js'
 import SkySphereMaterial from '../materials/SkySphereMaterial.js'

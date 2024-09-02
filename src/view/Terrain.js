@@ -1,4 +1,4 @@
-import { BufferGeometry, BufferAttribute, Float32BufferAttribute, DataTexture, Mesh, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, LinearFilter } from "three"
+import { BufferGeometry, BufferAttribute, Float32BufferAttribute, DataTexture, Mesh, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, LinearFilter, BackSide, FrontSide } from "three"
 
 export default class Terrain {
   constructor(view, terrains, terrainState) {
@@ -62,6 +62,8 @@ export default class Terrain {
       // Create mesh
       this.mesh = new Mesh(this.geometry, this.terrains.material)
       this.mesh.userData.texture = this.texture
+      this.mesh.castShadow = true
+      this.mesh.shadowSide = BackSide
       // this.mesh = new Mesh(this.geometry, new MeshNormalMaterial())
       this.view.scene.add(this.mesh)
 

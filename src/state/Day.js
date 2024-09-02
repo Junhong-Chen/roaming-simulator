@@ -1,5 +1,3 @@
-import Debugger from "../utils/Debugger.js"
-
 export default class Day {
   constructor(state) {
     this.state = state
@@ -7,17 +5,15 @@ export default class Day {
     this.autoUpdate = true
     this.timeProgress = 0
     this.progress = 0
-    this.duration = 15 // Seconds
+    this.duration = 20 // Seconds
 
     this.setDebug()
   }
 
   update() {
-    const clock = this.state.clock
-
     if (this.autoUpdate) {
-      this.timeProgress += clock.delta / this.duration
-      this.progress = this.timeProgress % 1
+      this.timeProgress += this.state.clock.delta / this.duration
+      this.progress = this.timeProgress % 1 // 白天: 0 ~ 0.5，夜晚: 0.5 ~ 1
     }
   }
 

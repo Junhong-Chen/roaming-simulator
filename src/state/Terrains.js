@@ -1,6 +1,5 @@
 import EventEmitter from "../core/EventEmitter"
 import seedrandom from "seedrandom"
-import Debugger from "../utils/Debugger"
 
 import terrainWorker from "../worker/terrain?worker"
 import Terrain from "./Terrain"
@@ -16,7 +15,7 @@ export default class Terrains extends EventEmitter {
 
     this.state = state
 
-    this.seed = 'CJ'
+    this.seed = 'JC'
     this.random = new seedrandom(this.seed)
     this.subdivisions = 40
     this.lacunarity = 2.05

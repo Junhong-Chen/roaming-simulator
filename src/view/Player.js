@@ -1,18 +1,30 @@
-import { AnimationMixer, Group, MathUtils } from "three"
+import { AnimationMixer, BoxGeometry, Group, MathUtils, Mesh, MeshStandardMaterial } from "three"
 
 export default class Player {
-  constructor(view, files) {
+  constructor(view) {
     this.state = view.state
+
     this.group = new Group()
     view.scene.add(this.group)
+  }
 
+  load(files) {
     const modelFile = files.get('player')[0].file
 
-    const { scene, animations } = modelFile
+    const { scene: model, animations } = modelFile
 
-    if (scene) this.group.add(scene)
+    if (model) {
+      this.model = model
+      model.traverse(child => {
+        if (child instanceof Mesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+        }
+      })
+      this.group.add(model)
+    }
 
-    this.mixer = new AnimationMixer(scene)
+    this.mixer = new AnimationMixer(model)
     if (animations) this.initActions(animations)
   }
 
@@ -47,32 +59,24 @@ export default class Player {
     before.crossFadeTo(current, duration, true)
   }
 
-  updateCrossFadeControls() {
-    Object.values(this.actions).forEach(action => {
-      if (action.weight === 0) {
-
-      }
-    })
-  }
-
   update(deltaTime) {
-    this.mixer.update(deltaTime)
+    if (this.mixer) this.mixer.update(deltaTime)
 
     const { position, rotation } = this.state.player
     this.group.position.set(...position.current)
 
-    let targetRotation = rotation - Math.PI
-    // 计算角度差
-    let diffRotation = targetRotation - this.group.rotation.y
-    if (diffRotation > Math.PI) {
-      targetRotation -= 2 * Math.PI
-    } else if (diffRotation < -Math.PI) {
-      targetRotation += 2 * Math.PI
+    if (this.model) {
+      let targetRotation = rotation - Math.PI
+      // 计算角度差
+      let diffRotation = targetRotation - this.model.rotation.y
+      if (diffRotation > Math.PI) {
+        targetRotation -= 2 * Math.PI
+      } else if (diffRotation < -Math.PI) {
+        targetRotation += 2 * Math.PI
+      }
+  
+      this.model.rotation.y = MathUtils.lerp(this.model.rotation.y, targetRotation, 0.1)
     }
-
-    this.group.rotation.y = MathUtils.lerp(this.group.rotation.y, targetRotation, 0.1)
-
-    this.updateCrossFadeControls()
   }
 
   destroy() {

@@ -13,7 +13,6 @@
   "author": "Junhong-Chen",
   "license": "ISC",
   "dependencies": {
-    "@jniac/three-point-text-helper": "^1.0.10",
     "gl-matrix": "^3.4.3",
     "gsap": "^3.12.5",
     "lil-gui": "^0.19.2",
@@ -21,6 +20,7 @@
     "three": "^0.164.1"
   },
   "devDependencies": {
+    "@jniac/three-point-text-helper": "^1.0.10",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",

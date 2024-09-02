@@ -266,7 +266,7 @@ export default class Chunk extends EventEmitter {
   }
 
   isInside(x, z) {
-    return x > this.bounding.xMin && x < this.bounding.xMax && z > this.bounding.zMin && z < this.bounding.zMax
+    return x >= this.bounding.xMin && x <= this.bounding.xMax && z >= this.bounding.zMin && z <= this.bounding.zMax
   }
 
   getChildChunkForPosition(x, z) {

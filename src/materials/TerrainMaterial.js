@@ -8,7 +8,8 @@ export default class TerrainMaterial extends ShaderMaterial {
     super({
       uniforms: {
         uPlayerPosition: new Uniform(null),
-        uGradientTexture: new Uniform(null),
+        uShadowMapTexture: new Uniform(null),
+        uShadowMatrix: new Uniform(null),
         uLightnessSmoothness: new Uniform(null),
         uFresnelOffset: new Uniform(null),
         uFresnelScale: new Uniform(null),

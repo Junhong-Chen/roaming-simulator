@@ -1,12 +1,12 @@
 import { Scene } from "three"
 import sources from "./sources"
 import Music from "./audio/music"
+import Debugger from "./utils/Debugger"
 import Viewport from "./core/Viewport"
 import Clock from "./core/Clock"
 import Loader from "./core/Loader"
 import Renderer from "./core/Renderer"
 import State from "./state/State"
-import Debugger from "./utils/Debugger"
 import View from "./view/View"
 
 export default class App {
