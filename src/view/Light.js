@@ -17,7 +17,7 @@ export default class Light {
     this.playerLightIntensity = 5
     this.playerLight = new DirectionalLight('white', this.playerLightIntensity)
     this.playerLight.castShadow = true
-    this.playerLight.shadow.camera.far = 16
+    this.playerLight.shadow.camera.far = 32
     this.playerLight.shadow.camera.top = 8
     this.playerLight.shadow.camera.right = 8
     this.playerLight.shadow.camera.bottom = -8

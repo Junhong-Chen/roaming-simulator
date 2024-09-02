@@ -108,23 +108,25 @@ void main() {
   float hdotl = dot(vec3(0.0, 1.0, 0.0), vLightDirection);
   // 黎明 & 黄昏
   float dusk = smoothstep(0.0, 0.2, hdotl);
+  // 亮度
+  float intensity = smoothstep(-1.5, 1.0, hdotl);
 
   float shadow = 0.0; // 默认地形全都有阴影
 
   if(ndotl > 0.1) {
-    if(ndotl < 0.5) {
-      shadow += ceil(ndotl / 0.5) * 0.5;
+    if(ndotl < 0.6) {
+      shadow += ceil(ndotl / 0.4) * 0.4;
     } else {
       shadow += 1.0;
     }
   }
 
-  shadow *= getShadow(uShadowMapTexture, vec2(2048.0), -0.005, 1.0, vShadowCoord, ndotl); // 玩家阴影
+  shadow *= getShadow(uShadowMapTexture, vec2(2048.0), 0.0, 1.0, vShadowCoord, ndotl); // 玩家阴影
   shadow *= dusk;
 
   shadow = smoothstep(-1.0, 1.0, shadow);
 
-  vec3 color = vColor * shadow;
+  vec3 color = vColor * shadow * intensity;
 
   gl_FragColor = vec4(color, 1.0);
 }

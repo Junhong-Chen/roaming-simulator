@@ -10,13 +10,8 @@ export default class TerrainMaterial extends ShaderMaterial {
         uPlayerPosition: new Uniform(null),
         uShadowMapTexture: new Uniform(null),
         uShadowMatrix: new Uniform(null),
-        uLightnessSmoothness: new Uniform(null),
-        uFresnelOffset: new Uniform(null),
-        uFresnelScale: new Uniform(null),
-        uFresnelPower: new Uniform(null),
         uSunPosition: new Uniform(null),
         uFogTexture: new Uniform(null),
-        uGrassDistance: new Uniform(null),
         uTexture: new Uniform(null)
       },
       vertexShader,

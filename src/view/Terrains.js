@@ -39,13 +39,8 @@ export default class Terrains {
   setMaterial() {
     this.material = new TerrainMaterial()
     this.material.uniforms.uPlayerPosition.value = new Vector3()
-    this.material.uniforms.uLightnessSmoothness.value = 0.25
-    this.material.uniforms.uFresnelOffset.value = 0
-    this.material.uniforms.uFresnelScale.value = 0.5
-    this.material.uniforms.uFresnelPower.value = 2
     this.material.uniforms.uSunPosition.value = new Vector3(- 0.5, - 0.5, - 0.5)
     this.material.uniforms.uFogTexture.value = this.view.sky.customRender.texture
-    this.material.uniforms.uGrassDistance.value = this.view.state.chunks.minSize
 
     this.material.onBeforeRender = (renderer, scene, camera, geometry, mesh) => {
       this.material.uniforms.uTexture.value = mesh.userData.texture
@@ -54,44 +49,7 @@ export default class Terrains {
     }
   }
 
-  setDebug() {
-    const debug = this.view.debug
-    if (!debug.gui)
-      return
-
-    const folder = debug.getFolder('view/terrains')
-
-    folder
-      .add(this.material, 'wireframe')
-
-    folder
-      .add(this.material.uniforms.uLightnessSmoothness, 'value')
-      .min(0)
-      .max(1)
-      .step(0.001)
-      .name('uLightnessSmoothness')
-
-    folder
-      .add(this.material.uniforms.uFresnelOffset, 'value')
-      .min(- 1)
-      .max(1)
-      .step(0.001)
-      .name('uFresnelOffset')
-
-    folder
-      .add(this.material.uniforms.uFresnelScale, 'value')
-      .min(0)
-      .max(2)
-      .step(0.001)
-      .name('uFresnelScale')
-
-    folder
-      .add(this.material.uniforms.uFresnelPower, 'value')
-      .min(1)
-      .max(10)
-      .step(1)
-      .name('uFresnelPower')
-  }
+  setDebug() { }
 
   update() {
     const playerPosition = this.view.state.player.position.current
