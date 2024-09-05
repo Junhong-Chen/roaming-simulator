@@ -1,8 +1,8 @@
-import { BackSide, BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, PlaneGeometry, Points, Scene, SphereGeometry, Vector3, WebGLRenderTarget, Group } from "three"
+import { BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, Points, Scene, Vector3, WebGLRenderTarget, Group, BoxGeometry, TextureLoader } from "three"
 
-import SkyBackgroundMaterial from '../materials/SkyBackgroundMaterial.js'
-import SkySphereMaterial from '../materials/SkySphereMaterial.js'
-import StarsMaterial from '../materials/StarsMaterial.js'
+import SkyBackgroundMaterial from "../materials/SkyBackgroundMaterial.js"
+import StarsMaterial from "../materials/StarsMaterial.js"
+import { Lensflare, LensflareElement } from "three/examples/jsm/Addons.js"
 
 export default class Sky {
   constructor(view) {
@@ -15,7 +15,6 @@ export default class Sky {
 
     this.setCustomRender()
     this.setBackground()
-    this.setSphere()
     this.setSun()
     this.setStars()
     this.setDebug()
@@ -37,52 +36,13 @@ export default class Sky {
   }
 
   setBackground() {
-    this.background = {}
+    this.background = new Mesh(
+      new BoxGeometry(1, 1, 1),
+      new SkyBackgroundMaterial()
+    )
 
-    this.background.geometry = new PlaneGeometry(2, 2)
-
-    // this.background.material = new MeshBasicMaterial({ wireframe: false, map: this.customRender.renderTarget.texture })
-    this.background.material = new SkyBackgroundMaterial()
-    this.background.material.uniforms.uTexture.value = this.customRender.renderTarget.texture
-    // this.background.material.wireframe = true
-    this.background.material.depthTest = false
-    this.background.material.depthWrite = false
-
-    this.background.mesh = new Mesh(this.background.geometry, this.background.material)
-    this.background.mesh.frustumCulled = false
-
-    this.group.add(this.background.mesh)
-  }
-
-  setSphere() {
-    this.sphere = {}
-    this.sphere.widthSegments = 128
-    this.sphere.heightSegments = 64
-    this.sphere.update = () => {
-      const geometry = new SphereGeometry(10, this.sphere.widthSegments, this.sphere.heightSegments)
-      if (this.sphere.geometry) {
-        this.sphere.geometry.dispose()
-        this.sphere.mesh.geometry = this.sphere.geometry
-      }
-
-      this.sphere.geometry = geometry
-    }
-    this.sphere.material = new SkySphereMaterial()
-
-    this.sphere.material.uniforms.uColorDayCycleLow.value.set(0xf0fff9)
-    this.sphere.material.uniforms.uColorDayCycleHigh.value.set(0x2e89ff)
-    this.sphere.material.uniforms.uColorNightLow.value.set(0x004794)
-    this.sphere.material.uniforms.uColorNightHigh.value.set(0x001624)
-    this.sphere.material.uniforms.uColorSun.value.set(0xff531a)
-    this.sphere.material.uniforms.uColorDawn.value.set(0xff4d00)
-    this.sphere.material.uniforms.uDayCycleProgress.value = 0
-    this.sphere.material.side = BackSide
-
-    this.sphere.update()
-
-    // this.sphere.material.wireframe = true
-    this.sphere.mesh = new Mesh(this.sphere.geometry, this.sphere.material)
-    this.customRender.scene.add(this.sphere.mesh)
+    this.background.scale.setScalar(10000)
+    this.group.add(this.background)
   }
 
   setSun() {
@@ -93,6 +53,15 @@ export default class Sky {
     const material = new MeshBasicMaterial({ color: 0xffffff })
     this.sun.mesh = new Mesh(geometry, material)
     this.group.add(this.sun.mesh)
+
+    // 光晕
+    const textureFlare = new TextureLoader().load('/textures/lensflare.png')
+    const lensflare = new Lensflare()
+    lensflare.addElement(new LensflareElement(textureFlare, 20, 0.75, new Color(0x33ff33)))
+    lensflare.addElement(new LensflareElement(textureFlare, 100, 0.8), new Color(0xffff00))
+    lensflare.addElement(new LensflareElement(textureFlare, 30, 1, new Color(0x48c9b0)))
+
+    this.sun.mesh.add(lensflare)
   }
 
   setStars() {
@@ -201,10 +170,6 @@ export default class Sky {
       playerState.position.current[2]
     )
 
-    // Sphere
-    this.sphere.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
-    this.sphere.material.uniforms.uDayCycleProgress.value = dayState.progress
-
     // Sun
     this.sun.mesh.position.set(
       sunState.position.x * this.sun.distance,
@@ -227,6 +192,8 @@ export default class Sky {
     renderer.setRenderTarget(this.customRender.renderTarget)
     renderer.render(this.customRender.scene, this.customRender.camera)
     renderer.setRenderTarget(null)
+
+    this.background.material.uniforms.sunPosition.value.copy(sunState.position)
   }
 
   resize() {

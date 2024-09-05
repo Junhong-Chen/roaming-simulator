@@ -17,8 +17,8 @@ export default class Water extends Mesh {
     const sunColor = 0xffffff
     const waterColor = 0x66a8ff
     const eye = new Vector3(0, 0, 0)
-    const distortionScale = 0.2 // 倒影失真系数
-    const sky = view.sky.background
+    const distortionScale = 0.15 // 倒影失真系数
+    // const sky = view.sky.background
 
     const mirrorPlane = new Plane()
     const normal = new Vector3()
@@ -132,9 +132,6 @@ export default class Water extends Mesh {
 
       eye.setFromMatrixPosition(camera.matrixWorld)
 
-      // 翻转天空
-      sky.material.uniforms.uInverse.value = true
-
       // Render
 
       const currentRenderTarget = renderer.getRenderTarget()
@@ -160,9 +157,6 @@ export default class Water extends Mesh {
       renderer.shadowMap.autoUpdate = currentShadowAutoUpdate
 
       renderer.setRenderTarget(currentRenderTarget)
-
-      // 还原天空
-      sky.material.uniforms.uInverse.value = false
 
       // Restore viewport
 

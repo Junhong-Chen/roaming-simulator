@@ -1,11 +1,11 @@
 uniform sampler2D uShadowMapTexture;
+uniform float uIntensity;
 
 varying vec3 vColor;
 varying vec4 vShadowCoord;
 varying vec3 vNormal;
 varying vec3 vLightDirection;
 varying float vDistance;
-varying float vLdotUp;
 varying float vNdotL;
 varying float vNdotUp;
 varying float vElevation;
@@ -109,9 +109,9 @@ float getShadow(sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float
 
 void main() {
   // 黎明 & 黄昏
-  float dusk = smoothstep(0.0, 0.2, vLdotUp);
+  float dusk = smoothstep(0.5, 0.6, uIntensity);
   // 亮度
-  float intensity = smoothstep(-1.3, 1.0, vLdotUp);
+  float intensity = smoothstep(0.3, 1.0, uIntensity);
 
   float shadow = 0.0; // 默认地形全都有阴影
 
@@ -140,7 +140,7 @@ void main() {
 
   // 水域
   vec3 uColorWaterDeep = vec3(0.0, 0.17, 0.24);
-  vec3 uColorWaterSurface = vec3(0.4, 0.93, 1.0);
+  vec3 uColorWaterSurface = vec3(0.4, 0.7, 1.0);
   if (vElevation < -0.2) {
     float waterSurfaceMix = smoothstep(-1.0, -0.2, vElevation);
     color = mix(uColorWaterSurface, uColorSand, waterSurfaceMix);

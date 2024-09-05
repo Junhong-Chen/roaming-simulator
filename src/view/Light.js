@@ -1,4 +1,5 @@
-import { AmbientLight, DirectionalLight, Vector3 } from "three"
+import { AmbientLight, DirectionalLight } from "three"
+import { smoothstep } from "../utils/utils"
 
 export default class Light {
 
@@ -9,7 +10,7 @@ export default class Light {
   }
 
   setAmbientLight() {
-    this.aLight = new AmbientLight('white', 0.5)
+    this.aLight = new AmbientLight('white', 1)
     this.view.scene.add(this.aLight)
   }
 
@@ -28,10 +29,9 @@ export default class Light {
   }
 
   update() {
-    const sunPosition = this.view.state.sun.position
-    const intensity = new Vector3(0, 1, 0).dot(sunPosition)
-    this.playerLight.intensity = Math.max(0, intensity * 5)
-    this.aLight.intensity = 0.2 + intensity * 0.2
+    const intensity = this.view.state.sun.intensity
+    this.playerLight.intensity = Math.max(0, (intensity - 0.5) * 5)
+    this.aLight.intensity = smoothstep(0.3, 1, intensity)
 
     const position = this.view.state.sun.position.clone().multiplyScalar(10)
     this.playerLight.position.copy(position)

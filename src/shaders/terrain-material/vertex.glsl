@@ -9,7 +9,6 @@ varying vec4 vShadowCoord;
 varying vec3 vNormal;
 varying vec3 vLightDirection;
 varying float vDistance;
-varying float vLdotUp;
 varying float vNdotL;
 varying float vNdotUp;
 varying float vElevation;
@@ -55,7 +54,6 @@ void main() {
   vNormal = normal;
   vLightDirection = normalize(uSunPosition);
   vDistance = distance(uPlayerPosition.xz, worldPosition.xz);
-  vLdotUp = dot(vec3(0.0, 1.0, 0.0), vLightDirection); // 计算地平线与光照方向的点积
   vNdotL = dot(normal, vLightDirection);
   vNdotUp = dot(normal, vec3(0.0, 1.0, 0.0));
   vElevation = terrainData.a;

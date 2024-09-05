@@ -36,15 +36,17 @@ export default class Terrains {
 
   update() {
     const playerPosition = this.view.state.player.position.current
-    const sunPosition = this.view.state.sun.position
-    
-    this.material.uniforms.uPlayerPosition.value.set(...playerPosition)
-    this.material.uniforms.uSunPosition.value.copy(sunPosition)
+    const sunState = this.view.state.sun
+    const uniforms = this.material.uniforms
+
+    uniforms.uPlayerPosition.value.set(...playerPosition)
+    uniforms.uSunPosition.value.copy(sunState.position)
+    uniforms.uIntensity.value = sunState.intensity
 
     const light = this.view.light.playerLight
     if (light) {
-      this.material.uniforms.uShadowMapTexture.value = light.shadow.map.texture
-      this.material.uniforms.uShadowMatrix.value = light.shadow.matrix
+      uniforms.uShadowMapTexture.value = light.shadow.map.texture
+      uniforms.uShadowMatrix.value = light.shadow.matrix
     }
   }
 
