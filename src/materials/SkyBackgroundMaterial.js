@@ -8,6 +8,7 @@ export default class SkyBackgroundMaterial extends ShaderMaterial {
     super({
       uniforms:
       {
+        uInverse: new Uniform(false),
         uTexture: new Uniform(null)
       },
       vertexShader: vertexShader,

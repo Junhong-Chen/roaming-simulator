@@ -25,7 +25,7 @@ export default class Sky {
     this.customRender = {}
     this.customRender.scene = new Scene()
     this.customRender.camera = this.view.camera.clone()
-    this.customRender.resolutionRatio = 0.1
+    this.customRender.resolutionRatio = 0.1 // 分辨率降低到屏幕分辨率的 10%
     this.customRender.renderTarget = new WebGLRenderTarget(
       this.view.viewport.width * this.customRender.resolutionRatio,
       this.view.viewport.height * this.customRender.resolutionRatio,
@@ -69,12 +69,12 @@ export default class Sky {
     }
     this.sphere.material = new SkySphereMaterial()
 
-    this.sphere.material.uniforms.uColorDayCycleLow.value.set('#f0fff9')
-    this.sphere.material.uniforms.uColorDayCycleHigh.value.set('#2e89ff')
-    this.sphere.material.uniforms.uColorNightLow.value.set('#004794')
-    this.sphere.material.uniforms.uColorNightHigh.value.set('#001624')
-    this.sphere.material.uniforms.uColorSun.value.set('#ff531a')
-    this.sphere.material.uniforms.uColorDawn.value.set('#ff1900')
+    this.sphere.material.uniforms.uColorDayCycleLow.value.set(0xf0fff9)
+    this.sphere.material.uniforms.uColorDayCycleHigh.value.set(0x2e89ff)
+    this.sphere.material.uniforms.uColorNightLow.value.set(0x004794)
+    this.sphere.material.uniforms.uColorNightHigh.value.set(0x001624)
+    this.sphere.material.uniforms.uColorSun.value.set(0xff531a)
+    this.sphere.material.uniforms.uColorDawn.value.set(0xff4d00)
     this.sphere.material.uniforms.uDayCycleProgress.value = 0
     this.sphere.material.side = BackSide
 
@@ -97,7 +97,7 @@ export default class Sky {
 
   setStars() {
     this.stars = {}
-    this.stars.count = 1000
+    this.stars.count = 500
     this.stars.distance = this.outerDistance
 
     this.stars.update = () => {

@@ -109,7 +109,6 @@ export default class Terrains extends EventEmitter {
     }
   }
 
-
   recreate() {
     for (const [key, terrain] of this.terrains) {
       // this.create(terrain.size, terrain.x, terrain.z)

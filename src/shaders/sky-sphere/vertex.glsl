@@ -87,5 +87,4 @@ void main() {
   color = blendAdd(color, uColorSun, sunGlowStrength);
 
   vColor = vec3(color);
-  // vColor = vec3(sunIntensity);
 }

@@ -16,8 +16,8 @@ export default class State {
     this.day = new Day(this)
     this.sun = new Sun(this)
     this.player = new Player(this)
-    this.terrains = new Terrains(this)
     this.chunks = new Chunks(this)
+    this.terrains = new Terrains(this)
   }
 
   update() {

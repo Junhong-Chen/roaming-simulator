@@ -3,7 +3,7 @@ import Light from "./Light"
 import Player from "./Player"
 import Sky from "./Sky"
 import Terrains from "./Terrains"
-import { Mesh, MeshStandardMaterial, Plane, PlaneGeometry, ShaderMaterial, Uniform } from "three"
+import Water from "./Water"
 
 export default class View {
   constructor(app) {
@@ -19,6 +19,7 @@ export default class View {
     this.player = new Player(this)
     this.light = new Light(this)
     this.sky = new Sky(this)
+    this.water = new Water(this)
     this.terrains = new Terrains(this)
   }
 
@@ -32,6 +33,7 @@ export default class View {
     this.light.update()
     this.sky.update()
     this.terrains.update()
+    this.water.update()
     this.player.update(deltaTime)
   }
 

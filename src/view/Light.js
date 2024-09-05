@@ -1,4 +1,4 @@
-import { AmbientLight, DirectionalLight } from "three"
+import { AmbientLight, DirectionalLight, Vector3 } from "three"
 
 export default class Light {
 
@@ -9,13 +9,12 @@ export default class Light {
   }
 
   setAmbientLight() {
-    this.aLight = new AmbientLight('white', 0.2)
+    this.aLight = new AmbientLight('white', 0.5)
     this.view.scene.add(this.aLight)
   }
 
   setPlayerLight() {
-    this.playerLightIntensity = 5
-    this.playerLight = new DirectionalLight('white', this.playerLightIntensity)
+    this.playerLight = new DirectionalLight('white', 5)
     this.playerLight.castShadow = true
     this.playerLight.shadow.camera.far = 32
     this.playerLight.shadow.camera.top = 8
@@ -29,8 +28,10 @@ export default class Light {
   }
 
   update() {
-    const intensity = -(this.view.state.day.progress - 0.5) * 2 * this.playerLightIntensity
-    this.playerLight.intensity = Math.max(0, intensity)
+    const sunPosition = this.view.state.sun.position
+    const intensity = new Vector3(0, 1, 0).dot(sunPosition)
+    this.playerLight.intensity = Math.max(0, intensity * 5)
+    this.aLight.intensity = 0.2 + intensity * 0.2
 
     const position = this.view.state.sun.position.clone().multiplyScalar(10)
     this.playerLight.position.copy(position)

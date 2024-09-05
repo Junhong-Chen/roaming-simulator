@@ -5,6 +5,12 @@ varying vec4 vShadowCoord;
 varying vec3 vNormal;
 varying vec3 vLightDirection;
 varying float vDistance;
+varying float vLdotUp;
+varying float vNdotL;
+varying float vNdotUp;
+varying float vElevation;
+varying vec3 vFogColor;
+varying float vFogIntensity;
 
 // #include ../common/inverseLerp.glsl;
 // #include ../common/remap.glsl;
@@ -102,31 +108,63 @@ float getShadow(sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float
 }
 
 void main() {
-  // 计算法线与光照方向的点积
-  float ndotl = dot(vNormal, vLightDirection);
-  // 计算地平线与光照方向的点积
-  float hdotl = dot(vec3(0.0, 1.0, 0.0), vLightDirection);
   // 黎明 & 黄昏
-  float dusk = smoothstep(0.0, 0.2, hdotl);
+  float dusk = smoothstep(0.0, 0.2, vLdotUp);
   // 亮度
-  float intensity = smoothstep(-1.5, 1.0, hdotl);
+  float intensity = smoothstep(-1.3, 1.0, vLdotUp);
 
   float shadow = 0.0; // 默认地形全都有阴影
 
-  if(ndotl > 0.1) {
-    if(ndotl < 0.6) {
-      shadow += ceil(ndotl / 0.4) * 0.4;
+  if (vNdotL > 0.1) {
+    if (vNdotL < 0.6) {
+      shadow += ceil(vNdotL / 0.4) * 0.4;
     } else {
       shadow += 1.0;
     }
   }
 
-  shadow *= getShadow(uShadowMapTexture, vec2(2048.0), 0.0, 1.0, vShadowCoord, ndotl); // 玩家阴影
+  shadow *= getShadow(uShadowMapTexture, vec2(2048.0), 0.0, 1.0, vShadowCoord, vNdotL); // 玩家阴影
   shadow *= dusk;
 
   shadow = smoothstep(-1.0, 1.0, shadow);
 
-  vec3 color = vColor * shadow * intensity;
+  vec3 color = vColor;
+
+  // 沙砾
+  // float sandMix = step(-0.2, vElevation);
+  vec3 uColorSand = vec3(1.0, 0.9, 0.8);
+  // color = mix(color, uColorSand, sandMix);
+  if (abs(vElevation) < 0.2) {
+    color = uColorSand;
+  }
+
+  // 水域
+  vec3 uColorWaterDeep = vec3(0.0, 0.17, 0.24);
+  vec3 uColorWaterSurface = vec3(0.4, 0.93, 1.0);
+  if (vElevation < -0.2) {
+    float waterSurfaceMix = smoothstep(-1.0, -0.2, vElevation);
+    color = mix(uColorWaterSurface, uColorSand, waterSurfaceMix);
+  }
+  if (vElevation < -1.0) {
+    float waterDepthMix = smoothstep(-10., -1.0, vElevation);
+    color = mix(uColorWaterDeep, uColorWaterSurface, waterDepthMix);
+  }
+
+  // 草地
+  // vec3 uColorGrass = vec3(0.3, 0.6, 0.3);
+  float grassMix = step(0.2, vElevation);
+  // color = mix(color, uColorGrass, grassMix);
+
+  // 岩土
+  float rockMix = step(vNdotUp, .75);
+  vec3 uRockColor = vec3(0.4, 0.3, 0.2);
+  rockMix *= grassMix;
+  color = mix(color, uRockColor, rockMix);
+
+  // 雾层
+  color = mix(color, vFogColor, vFogIntensity);
+
+  color *= shadow * intensity;
 
   gl_FragColor = vec4(color, 1.0);
 }

@@ -51,6 +51,7 @@ export default class Camera {
       vec3.copy(this.position, this.fly.position)
       quat2.copy(this.quaternion, this.fly.quaternion)
     }
+
   }
 
   setDebug() {
@@ -270,7 +271,9 @@ export class CameraThirdPerson {
 
     // Clamp to ground
     const chunks = this.state.chunks
-    const elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
+    let elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
+
+    if (elevation < -0.5) elevation = -0.5
 
     if (elevation && this.position[1] < elevation + 1)
       this.position[1] = elevation + 1

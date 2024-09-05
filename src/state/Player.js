@@ -5,7 +5,7 @@ import Camera from "./Camera.js"
 const ACTIONS = {
   RUNNING: 'running',
   SITTING: 'sitting',
-  IDLE: 'standing',
+  IDLE: 'idle',
   STANDING_UP: 'standing up',
   SWIMMING: 'swimming',
   TREADING_WATER: 'treading water',
@@ -94,9 +94,9 @@ export default class Player extends EventEmitter {
     const chunks = this.state.chunks
     const elevation = chunks.getElevationForPosition(this.position.current[0], this.position.current[2])
 
-    if (elevation)
+    if (elevation && elevation > -0.5)
       this.position.current[1] = elevation
     else
-      this.position.current[1] = 0
+      this.position.current[1] = -0.5
   }
 }
