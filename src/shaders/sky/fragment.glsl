@@ -18,7 +18,7 @@ const float N = 2.545E25; // number of molecules per unit volume for air at 288.
 const float rayleighZenithLength = 8.4E3;
 const float mieZenithLength = 1.25E3;
 // 66 arc seconds -> degrees, and the cosine of that
-const float sunAngularDiameterCos = 0.9998;
+const float sunAngularDiameterCos = 0.9995;
 
 // 3.0 / ( 16.0 * pi )
 const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
@@ -75,7 +75,7 @@ void main() {
   vec3 L0 = vec3(0.1) * Fex;
 
   // composition + solar disc
-  float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.0002, cosTheta);
+  float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
   L0 += (vSunE * 19000.0 * Fex) * sundisk;
 
   vec3 texColor = (Lin + L0) * 0.005 + vec3(0.0, 0.0002, 0.00075);

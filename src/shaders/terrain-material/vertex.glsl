@@ -30,7 +30,7 @@ void main() {
   vec3 color = vec3(0.3, 0.6, 0.3);
 
   // Soil
-  vec3 dirtColor = vec3(0.1, 0.1, 0.1);
+  vec3 dirtColor = vec3(0.1);
   color = mix(dirtColor, color, terrainData.g);
 
   // Varyings

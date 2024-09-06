@@ -11,6 +11,7 @@ uniform vec3 waterColor;
 
 varying vec4 mirrorCoord;
 varying vec4 worldPosition;
+varying vec2 vUv;
 
 vec4 getNoise(vec2 uv) {
   vec2 uv0 = (uv / 103.0) + vec2(time / 17.0, time / 29.0);
@@ -46,17 +47,18 @@ void main() {
   vec4 noise = getNoise(worldPosition.xz * size);
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
-  vec3 diffuseLight = vec3(0.0);
-  vec3 specularLight = vec3(0.0);
+  // vec3 diffuseLight = vec3(0.0);
+  // vec3 specularLight = vec3(0.0);
 
   vec3 worldToEye = eye - worldPosition.xyz;
-  vec3 eyeDirection = normalize(worldToEye);
-					// sunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );
+  // vec3 eyeDirection = normalize(worldToEye);
+  // sunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );
 
-  float distance = length(worldToEye);
+  float d = length(worldToEye);
 
-  vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / distance) * distortionScale;
-  vec3 reflectionSample = vec3(texture2D(mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion));
+  float t = 1.0 - clamp(0.0001 / distance(vUv, vec2(0.5)) - 0.5, 0.0, 1.0); // 角色倒影偏离矫正
+  vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / d) * distortionScale;
+  vec3 reflectionSample = vec3(texture2D(mirrorSampler, mirrorCoord.xy / mirrorCoord.w + distortion * t));
 
   // float theta = max(dot(eyeDirection, surfaceNormal), 0.0);
   // float rf0 = 0.3;

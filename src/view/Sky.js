@@ -175,8 +175,7 @@ export default class Sky {
     // Stars
     const starsUniforms = this.stars.material.uniforms
     starsUniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
-    starsUniforms.uHeightFragments.value = this.view.viewport.height * this.view.viewport.clampedPixelRatio
-    starsUniforms.uIntensity.value = sunState.intensity
+    starsUniforms.uHeightFragments.value = this.view.viewport.height * this.view.viewport.pixelRatio
   }
 
   resize() {

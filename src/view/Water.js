@@ -1,5 +1,6 @@
 import { DoubleSide, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, TextureLoader, Vector3, Vector4, WebGLRenderTarget } from "three"
 import WaterMaterial from "../materials/WaterMaterial"
+import { remap } from "../utils/utils"
 
 export default class Water extends Mesh {
   constructor(view) {
@@ -17,7 +18,6 @@ export default class Water extends Mesh {
     const sunColor = 0xffffff
     const waterColor = 0x66a8ff
     const eye = new Vector3(0, 0, 0)
-    const distortionScale = 0.15 // 倒影失真系数
     // const sky = view.sky.background
 
     const mirrorPlane = new Plane()
@@ -36,21 +36,21 @@ export default class Water extends Mesh {
 
     const mirrorCamera = new PerspectiveCamera()
 
-    const renderTarget = new WebGLRenderTarget(1024, 1024)
+    const renderTarget = new WebGLRenderTarget(this.view.viewport.width, this.view.viewport.height)
 
     const material = this.material = new WaterMaterial({
       fog: view.scene.fog !== undefined
     })
 
-    material.uniforms['mirrorSampler'].value = renderTarget.texture
-    material.uniforms['textureMatrix'].value = textureMatrix
-    material.uniforms['alpha'].value = alpha
-    material.uniforms['normalSampler'].value = normalSampler
-    material.uniforms['sunColor'].value = sunColor
-    material.uniforms['waterColor'].value = waterColor
-    material.uniforms['sunDirection'].value = sunDirection
-    material.uniforms['distortionScale'].value = distortionScale
-    material.uniforms['eye'].value = eye
+    material.uniforms.mirrorSampler.value = renderTarget.texture
+    material.uniforms.textureMatrix.value = textureMatrix
+    material.uniforms.alpha.value = alpha
+    material.uniforms.normalSampler.value = normalSampler
+    material.uniforms.sunColor.value = sunColor
+    material.uniforms.waterColor.value = waterColor
+    material.uniforms.sunDirection.value = sunDirection
+    material.uniforms.distortionScale.value = 0.175 // 倒影失真系数
+    material.uniforms.eye.value = eye
 
     const scope = this
     this.onBeforeRender = function (renderer, scene, camera) {
@@ -101,7 +101,7 @@ export default class Water extends Mesh {
         0.0, 0.0, 0.5, 0.5,
         0.0, 0.0, 0.0, 1.0
       ) // 将矩阵设置为偏移和缩放矩阵
-      // 将把镜像相机的坐标变换到纹理空间，用于生成反射纹理
+      // 将镜像相机的坐标变换到纹理空间，用于生成反射纹理
       textureMatrix.multiply(mirrorCamera.projectionMatrix)
       textureMatrix.multiply(mirrorCamera.matrixWorldInverse)
 
@@ -207,7 +207,8 @@ export default class Water extends Mesh {
     // 查看纹理
     // this.shadowMapMaterial.needsUpdate = true
 
-    this.material.uniforms.time.value = clock.elapsed * 0.1
+    const uniforms = this.material.uniforms
+    uniforms.time.value = clock.elapsed * 0.1
   }
 
   resize() {

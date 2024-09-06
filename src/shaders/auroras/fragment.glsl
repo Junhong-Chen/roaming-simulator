@@ -56,13 +56,13 @@ float hash21(in vec2 n) {
 
 // 极光生成函数
 vec4 aurora(vec3 ro, vec3 rd) {
-  vec4 col = vec4(0);
+  vec4 color = vec4(0);
   vec4 avgCol = vec4(0); // 平均颜色
-  vec3 mixCol = 1. - vec3(2.15, -.5, 1.2); // 混合基色
+  vec3 mixCol = 1. - vec3(2.15, -.75, 1.2); // 混合基色
   float rdFactor = rd.y * 2. + .4;
   float rf = hash21(gl_FragCoord.xy); // 随机值
 
-  for(float i = 0.; i < 50.; i++) // 循环叠加颜色
+  for(float i = 0.; i < 30.; i++) // 循环叠加颜色、循环次数越多，效果越逼真
   {
     float of = .006 * rf * smoothstep(0., 15., i); // 随机偏移
     float pt = ((.8 + pow(i, 1.4) * .002) - ro.y) / rdFactor; // 计算光线步长
@@ -70,14 +70,14 @@ vec4 aurora(vec3 ro, vec3 rd) {
     vec3 bpos = ro + pt * rd; // 计算光线位置
     vec2 p = bpos.zx;
     float rzt = triNoise2d(p, .06); // 获取噪声值
-    vec4 col2 = vec4(0, 0, 0, rzt); // 设置颜色透明度
-    col2.rgb = (sin(mixCol + i * .043) * .5 + .5) * rzt; // 设置颜色
-    avgCol = avgCol * .5 + col2 * .5; // 混合颜色 mix(avgCol, col2, .5)
-    col += avgCol * exp2(-i * .065 - 2.5) * smoothstep(0., 5., i); // 累加颜色
+    vec4 col = vec4(0, 0, 0, rzt); // 设置颜色透明度
+    col.rgb = (sin(mixCol + i * .06) * .5 + .5) * rzt; // 对颜色进行偏移
+    avgCol = avgCol * .5 + col * .5; // 混合颜色 mix(avgCol, col, .5)
+    color += avgCol * exp2(-i * .065 - 2.5) * smoothstep(0., 5., i); // 累加颜色
   }
 
-  col *= (clamp(rd.y * 15. + .4, 0., 1.)); // 颜色调整
-  return col * 1.8; // 返回最终颜色
+  color *= clamp(rd.y * 15. + .4, 0., 1.) * 1.8; // 颜色调整
+  return color;
 }
 
 // 生成三维随机数，用于背景星星的生成
@@ -118,15 +118,15 @@ void main() {
   vec3 rd = vRd; // 光线方向
 
   vec3 color = vec3(0.); // 初始化颜色
-  vec3 brd = rd; // 保存光线方向
-  float fade = smoothstep(0., 0.01, abs(brd.y)) * 0.1 + 0.9; // 计算淡化效果
+  float fade = smoothstep(0., 0.01, abs(rd.y)) * 0.1 + 0.9; // 计算淡化效果
 
-  // color = bg(rd) * fade;
+  // color = bg(rd) * fade; // 添加背景色
 
-  if(rd.y > 0. && uIntensity < 0.3) { // 如果光线朝向天空 & 夜晚
+  float nightI = .25;
+  if(rd.y > 0. && uIntensity < nightI) { // 如果光线朝向天空 & 夜晚
     vec4 aur = smoothstep(0., 1.5, aurora(ro, rd)) * fade; // 生成极光
     // color += stars(rd); // 添加星星
-    color = aur.rgb * smoothstep(.3, 0., uIntensity); // 混合极光和背景颜色
+    color = aur.rgb * smoothstep(nightI, 0., uIntensity); // 混合极光和背景颜色
   }
 
   gl_FragColor = vec4(color, 1.);

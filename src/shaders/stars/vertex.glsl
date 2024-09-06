@@ -9,6 +9,7 @@ attribute float aSize;
 attribute vec3 aColor;
 
 varying vec3 vColor;
+varying float vIntensity;
 
 void main() {
   // Vertex position
@@ -17,13 +18,13 @@ void main() {
 
   // Sun size multiplier
   vec3 normalizedPosition = normalize(modelPosition.xyz);
-  float sunSizeMultiplier = 1.0 - (dot(normalize(uSunPosition), normalizedPosition) * 0.5 + 0.5);
+  vIntensity = 1.0 - (dot(normalize(uSunPosition), normalizedPosition) * 0.5 + 0.5);
 
-  gl_PointSize = aSize * uSize * sunSizeMultiplier * uHeightFragments;
+  gl_PointSize = aSize * uSize * uHeightFragments;
 
   // Clip out if too small
-  if(gl_PointSize < 0.5)
-    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+  // if(gl_PointSize < 0.1)
+  //   gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
 
   vColor = mix(aColor, vec3(1.0), uBrightness);
 }

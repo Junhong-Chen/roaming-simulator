@@ -130,29 +130,32 @@ void main() {
 
   vec3 color = vColor;
 
+  float sandBorder = 0.8;
+  float waterBorder = 2.0;
+
   // 沙砾
   // float sandMix = step(-0.2, vElevation);
   vec3 uColorSand = vec3(1.0, 0.9, 0.8);
   // color = mix(color, uColorSand, sandMix);
-  if (abs(vElevation) < 0.2) {
+  if (abs(vElevation) < sandBorder) {
     color = uColorSand;
   }
 
   // 水域
   vec3 uColorWaterDeep = vec3(0.0, 0.17, 0.24);
-  vec3 uColorWaterSurface = vec3(0.4, 0.7, 1.0);
-  if (vElevation < -0.2) {
-    float waterSurfaceMix = smoothstep(-1.0, -0.2, vElevation);
+  vec3 uColorWaterSurface = vec3(0.1, 0.4, 0.7);
+  if (vElevation < -sandBorder) {
+    float waterSurfaceMix = smoothstep(-waterBorder, -sandBorder, vElevation);
     color = mix(uColorWaterSurface, uColorSand, waterSurfaceMix);
   }
-  if (vElevation < -1.0) {
-    float waterDepthMix = smoothstep(-10., -1.0, vElevation);
+  if (vElevation < -waterBorder) {
+    float waterDepthMix = smoothstep(-10., -waterBorder, vElevation);
     color = mix(uColorWaterDeep, uColorWaterSurface, waterDepthMix);
   }
 
   // 草地
   // vec3 uColorGrass = vec3(0.3, 0.6, 0.3);
-  float grassMix = step(0.2, vElevation);
+  float grassMix = step(sandBorder, vElevation);
   // color = mix(color, uColorGrass, grassMix);
 
   // 岩土

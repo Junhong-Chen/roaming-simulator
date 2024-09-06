@@ -12,7 +12,6 @@ export default class StarsMaterial extends ShaderMaterial {
         uSize: new Uniform(0.01),
         uBrightness: new Uniform(0.5),
         uHeightFragments: new Uniform(null),
-        uIntensity: new Uniform(1)
       },
       vertexShader,
       fragmentShader,
