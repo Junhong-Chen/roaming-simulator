@@ -1,7 +1,6 @@
 uniform vec3 uPlayerPosition;
 uniform vec3 uSunPosition;
 uniform sampler2D uTexture;
-uniform sampler2D uFogTexture;
 uniform mat4 uShadowMatrix;
 
 varying vec3 vColor;
@@ -14,12 +13,6 @@ varying float vNdotUp;
 varying float vElevation;
 varying vec3 vFogColor;
 varying float vFogIntensity;
-
-vec3 getFogColor(vec2 screenUv) {
-  vec3 fogColor = texture2D(uFogTexture, screenUv).rgb;
-
-  return fogColor;
-}
 
 void main() {
   vec4 worldPosition = modelMatrix * vec4(position, 1.0);
@@ -42,8 +35,8 @@ void main() {
 
   // Varyings
   // Fog
-  vec2 screenUv = (gl_Position.xy / gl_Position.w * 0.5) + 0.5;
-  vFogColor = getFogColor(screenUv);
+  vDistance = distance(uPlayerPosition.xz, worldPosition.xz);
+  vFogColor = vec3(0.5) * smoothstep(250.0, 500.0, max(0.0, vDistance - 250.0));
   vFogIntensity = 1.0 - exp(-0.001 * 0.001 * depth * depth);
 
   // Shadow
@@ -53,7 +46,6 @@ void main() {
   vColor = color;
   vNormal = normal;
   vLightDirection = normalize(uSunPosition);
-  vDistance = distance(uPlayerPosition.xz, worldPosition.xz);
   vNdotL = dot(normal, vLightDirection);
   vNdotUp = dot(normal, vec3(0.0, 1.0, 0.0));
   vElevation = terrainData.a;

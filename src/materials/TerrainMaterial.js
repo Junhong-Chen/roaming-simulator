@@ -11,7 +11,6 @@ export default class TerrainMaterial extends ShaderMaterial {
         uShadowMapTexture: new Uniform(null),
         uShadowMatrix: new Uniform(null),
         uSunPosition: new Uniform(null),
-        uFogTexture: new Uniform(null),
         uTexture: new Uniform(null),
         uIntensity: new Uniform(1)
       },

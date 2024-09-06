@@ -1,8 +1,9 @@
-import { BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, Points, Scene, Vector3, WebGLRenderTarget, Group, BoxGeometry, TextureLoader } from "three"
+import { BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, Points, Scene, Vector3, WebGLRenderTarget, Group, BoxGeometry, TextureLoader, Uniform, Matrix4 } from "three"
 
-import SkyBackgroundMaterial from "../materials/SkyBackgroundMaterial.js"
+import SkyMaterial from "../materials/SkyMaterial.js"
 import StarsMaterial from "../materials/StarsMaterial.js"
 import { Lensflare, LensflareElement } from "three/examples/jsm/Addons.js"
+import AurorasMaterial from "../materials/AurorasMaterial.js"
 
 export default class Sky {
   constructor(view) {
@@ -13,43 +14,43 @@ export default class Sky {
     this.group = new Group()
     this.view.scene.add(this.group)
 
-    this.setCustomRender()
     this.setBackground()
+    this.setAuroras()
     this.setSun()
     this.setStars()
     this.setDebug()
   }
 
-  setCustomRender() {
-    this.customRender = {}
-    this.customRender.scene = new Scene()
-    this.customRender.camera = this.view.camera.clone()
-    this.customRender.resolutionRatio = 0.1 // 分辨率降低到屏幕分辨率的 10%
-    this.customRender.renderTarget = new WebGLRenderTarget(
-      this.view.viewport.width * this.customRender.resolutionRatio,
-      this.view.viewport.height * this.customRender.resolutionRatio,
-      {
-        generateMipmaps: false
-      }
+  setBackground() {
+    this.background = {}
+    this.background.mesh = new Mesh(
+      new BoxGeometry(1, 1, 1),
+      new SkyMaterial()
     )
-    this.customRender.texture = this.customRender.renderTarget.texture
+
+    this.background.mesh.scale.setScalar(10000)
+    this.group.add(this.background.mesh)
   }
 
-  setBackground() {
-    this.background = new Mesh(
+  setAuroras() {
+    this.auroras = {}
+    const material = new AurorasMaterial()
+    material.uniforms.uResolution.value.set(this.view.viewport.width, this.view.viewport.height)
+
+    this.auroras.mesh = new Mesh(
       new BoxGeometry(1, 1, 1),
-      new SkyBackgroundMaterial()
+      material
     )
 
-    this.background.scale.setScalar(10000)
-    this.group.add(this.background)
+    this.auroras.mesh.scale.setScalar(10000)
+    this.group.add(this.auroras.mesh)
   }
 
   setSun() {
     this.sun = {}
     this.sun.distance = this.outerDistance - 50
 
-    const geometry = new CircleGeometry(0.02 * this.sun.distance, 32)
+    const geometry = new CircleGeometry(0, 1) // 太阳在背景 shader 中模拟
     const material = new MeshBasicMaterial({ color: 0xffffff })
     this.sun.mesh = new Mesh(geometry, material)
     this.group.add(this.sun.mesh)
@@ -129,27 +130,6 @@ export default class Sky {
     if (!debug.gui)
       return
 
-    // Sphere
-    const sphereGeometryFolder = debug.getFolder('view/sky/sphere/geometry')
-
-    sphereGeometryFolder.add(this.sphere, 'widthSegments').min(4).max(512).step(1).name('widthSegments').onChange(() => { this.sphere.update() })
-    sphereGeometryFolder.add(this.sphere, 'heightSegments').min(4).max(512).step(1).name('heightSegments').onChange(() => { this.sphere.update() })
-
-    const sphereMaterialFolder = debug.getFolder('view/sky/sphere/material')
-
-    sphereMaterialFolder.add(this.sphere.material.uniforms.uAtmosphereElevation, 'value').min(0).max(5).step(0.01).name('uAtmosphereElevation')
-    sphereMaterialFolder.add(this.sphere.material.uniforms.uAtmospherePower, 'value').min(0).max(20).step(1).name('uAtmospherePower')
-    sphereMaterialFolder.addColor(this.sphere.material.uniforms.uColorDayCycleLow, 'value').name('uColorDayCycleLow')
-    sphereMaterialFolder.addColor(this.sphere.material.uniforms.uColorDayCycleHigh, 'value').name('uColorDayCycleHigh')
-    sphereMaterialFolder.addColor(this.sphere.material.uniforms.uColorNightLow, 'value').name('uColorNightLow')
-    sphereMaterialFolder.addColor(this.sphere.material.uniforms.uColorNightHigh, 'value').name('uColorNightHigh')
-    sphereMaterialFolder.add(this.sphere.material.uniforms.uDawnAngleAmplitude, 'value').min(0).max(1).step(0.001).name('uDawnAngleAmplitude')
-    sphereMaterialFolder.add(this.sphere.material.uniforms.uDawnElevationAmplitude, 'value').min(0).max(1).step(0.01).name('uDawnElevationAmplitude')
-    sphereMaterialFolder.addColor(this.sphere.material.uniforms.uColorDawn, 'value').name('uColorDawn')
-    sphereMaterialFolder.add(this.sphere.material.uniforms.uSunAmplitude, 'value').min(0).max(3).step(0.01).name('uSunAmplitude')
-    sphereMaterialFolder.add(this.sphere.material.uniforms.uSunMultiplier, 'value').min(0).max(1).step(0.01).name('uSunMultiplier')
-    sphereMaterialFolder.addColor(this.sphere.material.uniforms.uColorSun, 'value').name('uColorSun')
-
     // Stars
     const starsFolder = debug.getFolder('view/sky/stars')
 
@@ -162,6 +142,16 @@ export default class Sky {
     const dayState = this.view.state.day
     const sunState = this.view.state.sun
     const playerState = this.view.state.player
+    const camera = this.view.camera
+
+    // Background
+    this.background.mesh.material.uniforms.sunPosition.value.copy(sunState.position)
+
+    // Auroras
+    const aurorasUniforms = this.auroras.mesh.material.uniforms
+    aurorasUniforms.uTime.value = this.view.clock.elapsed
+    aurorasUniforms.uCameraPosition.value.copy(camera.position)
+    aurorasUniforms.uIntensity.value = sunState.intensity
 
     // Group
     this.group.position.set(
@@ -183,21 +173,15 @@ export default class Sky {
     )
 
     // Stars
-    this.stars.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
-    this.stars.material.uniforms.uHeightFragments.value = this.view.viewport.height * this.view.viewport.clampedPixelRatio
-
-    // Render in render target
-    this.customRender.camera.quaternion.copy(this.view.camera.quaternion)
-    const renderer = this.view.renderer
-    renderer.setRenderTarget(this.customRender.renderTarget)
-    renderer.render(this.customRender.scene, this.customRender.camera)
-    renderer.setRenderTarget(null)
-
-    this.background.material.uniforms.sunPosition.value.copy(sunState.position)
+    const starsUniforms = this.stars.material.uniforms
+    starsUniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
+    starsUniforms.uHeightFragments.value = this.view.viewport.height * this.view.viewport.clampedPixelRatio
+    starsUniforms.uIntensity.value = sunState.intensity
   }
 
   resize() {
-    this.customRender.renderTarget.width = this.view.viewport.width * this.customRender.resolutionRatio
-    this.customRender.renderTarget.height = this.view.viewport.height * this.customRender.resolutionRatio
+    const { width, height } = this.view.viewport
+
+    this.auroras.mesh.material.uniforms.uResolution.value.set(width, height)
   }
 }

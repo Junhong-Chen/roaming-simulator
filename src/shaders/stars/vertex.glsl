@@ -18,7 +18,6 @@ void main() {
   // Sun size multiplier
   vec3 normalizedPosition = normalize(modelPosition.xyz);
   float sunSizeMultiplier = 1.0 - (dot(normalize(uSunPosition), normalizedPosition) * 0.5 + 0.5);
-  // sunSizeMultiplier = smoothstep(0.1, 1.0, sunSizeMultiplier);
 
   gl_PointSize = aSize * uSize * sunSizeMultiplier * uHeightFragments;
 

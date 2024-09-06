@@ -31,7 +31,7 @@ export default class Light {
   update() {
     const intensity = this.view.state.sun.intensity
     this.playerLight.intensity = Math.max(0, (intensity - 0.5) * 5)
-    this.aLight.intensity = smoothstep(0.3, 1, intensity)
+    this.aLight.intensity = Math.max(0.1, smoothstep(0.4, 1, intensity))
 
     const position = this.view.state.sun.position.clone().multiplyScalar(10)
     this.playerLight.position.copy(position)

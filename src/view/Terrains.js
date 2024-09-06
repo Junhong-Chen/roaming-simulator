@@ -1,4 +1,4 @@
-import { DoubleSide, Vector3 } from "three"
+import { Vector3 } from "three"
 
 import Terrain from "./Terrain.js"
 import TerrainMaterial from "../materials/TerrainMaterial.js"
@@ -23,7 +23,6 @@ export default class Terrains {
     this.material = new TerrainMaterial()
     this.material.uniforms.uPlayerPosition.value = new Vector3()
     this.material.uniforms.uSunPosition.value = new Vector3(- 0.5, - 0.5, - 0.5)
-    this.material.uniforms.uFogTexture.value = this.view.sky.customRender.texture
 
     this.material.onBeforeRender = (renderer, scene, camera, geometry, mesh) => {
       this.material.uniforms.uTexture.value = mesh.userData.texture

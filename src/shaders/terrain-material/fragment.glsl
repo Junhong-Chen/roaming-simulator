@@ -157,14 +157,14 @@ void main() {
 
   // 岩土
   float rockMix = step(vNdotUp, .75);
-  vec3 uRockColor = vec3(0.4, 0.3, 0.2);
+  vec3 uRockColor = vec3(0.35, 0.25, 0.15);
   rockMix *= grassMix;
   color = mix(color, uRockColor, rockMix);
 
   // 雾层
   color = mix(color, vFogColor, vFogIntensity);
 
-  color *= shadow * intensity;
+  color *= shadow * max(0.3, intensity);
 
   gl_FragColor = vec4(color, 1.0);
 }

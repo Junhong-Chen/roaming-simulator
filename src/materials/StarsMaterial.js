@@ -11,10 +11,12 @@ export default class StarsMaterial extends ShaderMaterial {
         uSunPosition: new Uniform(new Vector3()),
         uSize: new Uniform(0.01),
         uBrightness: new Uniform(0.5),
-        uHeightFragments: new Uniform(null)
+        uHeightFragments: new Uniform(null),
+        uIntensity: new Uniform(1)
       },
       vertexShader,
-      fragmentShader
+      fragmentShader,
+      transparent: true
     })
   }
 }

@@ -18,7 +18,7 @@ const float N = 2.545E25; // number of molecules per unit volume for air at 288.
 const float rayleighZenithLength = 8.4E3;
 const float mieZenithLength = 1.25E3;
 // 66 arc seconds -> degrees, and the cosine of that
-const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;
+const float sunAngularDiameterCos = 0.9998;
 
 // 3.0 / ( 16.0 * pi )
 const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
@@ -35,6 +35,13 @@ float hgPhase(float cosTheta, float g) {
   return ONE_OVER_FOURPI * ((1.0 - g2) * inverse);
 }
 
+vec3 bg(in vec3 rd) {
+  float sd = dot(normalize(vec3(-0.5, -0.6, 0.9)), rd) * 0.5 + 0.5; // 计算背景颜色混合比例
+  sd = pow(sd, 5.); // 调整混合比例
+  vec3 col = mix(vec3(0.05, 0.1, 0.2), vec3(0.1, 0.05, 0.2), sd); // 生成背景颜色
+  return col * .63; // 返回背景颜色
+}
+
 void main() {
 
   vec3 direction = normalize(vWorldPosition - cameraPosition);
@@ -47,7 +54,7 @@ void main() {
   float sM = mieZenithLength * inverse;
 
   // combined extinction factor
-  vec3 Fex = exp(-(vBetaR * sR + vBetaM * sM));
+  vec3 Fex = exp(-(vBetaR * sR + vBetaM * sM)); // 黄昏/黎明
 
   // in scattering
   float cosTheta = dot(direction, vSunDirection);
@@ -59,19 +66,19 @@ void main() {
   vec3 betaMTheta = vBetaM * mPhase;
 
   vec3 Lin = pow(vSunE * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * (1.0 - Fex), vec3(1.5));
-  Lin *= mix(vec3(1.0, 0.9, 0.8), pow(vSunE * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * Fex, vec3(1.0 / 2.0)), clamp(pow(1.0 - dot(up, vSunDirection), 5.0), 0.0, 1.0));
+  Lin *= mix(vec3(1.0), pow(vSunE * ((betaRTheta + betaMTheta) / (vBetaR + vBetaM)) * Fex, vec3(1.0 / 2.0)), clamp(pow(1.0 - dot(up, vSunDirection), 5.0), 0.0, 1.0));
 
   // nightsky
-  float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]
-  float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]
-  vec2 uv = vec2(phi, theta) / vec2(2.0 * pi, pi) + vec2(0.5, 0.0);
+  // float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]
+  // float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]
+  // vec2 uv = vec2(phi, theta) / vec2(2.0 * pi, pi) + vec2(0.5, 0.0);
   vec3 L0 = vec3(0.1) * Fex;
 
   // composition + solar disc
-  float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta);
+  float sundisk = smoothstep(sunAngularDiameterCos, sunAngularDiameterCos + 0.0002, cosTheta);
   L0 += (vSunE * 19000.0 * Fex) * sundisk;
 
-  vec3 texColor = (Lin + L0) * 0.005 + vec3(0.0, 0.005, 0.015);
+  vec3 texColor = (Lin + L0) * 0.005 + vec3(0.0, 0.0002, 0.00075);
 
   vec3 retColor = pow(texColor, vec3(1.0 / (1.2 + (1.2 * vSunfade))));
 
