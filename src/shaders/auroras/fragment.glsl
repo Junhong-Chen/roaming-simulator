@@ -62,7 +62,7 @@ vec4 aurora(vec3 ro, vec3 rd) {
   float rdFactor = rd.y * 2. + .4;
   float rf = hash21(gl_FragCoord.xy); // 随机值
 
-  for(float i = 0.; i < 30.; i++) // 循环叠加颜色、循环次数越多，效果越逼真
+  for(float i = 0.; i < 37.; i++) // 循环叠加颜色、循环次数越多，效果越逼真
   {
     float of = .006 * rf * smoothstep(0., 15., i); // 随机偏移
     float pt = ((.8 + pow(i, 1.4) * .002) - ro.y) / rdFactor; // 计算光线步长

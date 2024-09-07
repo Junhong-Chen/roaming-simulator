@@ -37,6 +37,12 @@ export default class View {
     this.player.update(deltaTime)
   }
 
+  resize(width, height) {
+    this.camera.resize(width, height)
+    this.sky.resize(width, height)
+    this.water.resize(width, height)
+  }
+
   destroy() {
     this.scene.traverse(child => {
       if (child.isMesh) {

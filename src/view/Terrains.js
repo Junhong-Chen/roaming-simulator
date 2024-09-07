@@ -34,7 +34,7 @@ export default class Terrains {
   setDebug() { }
 
   update() {
-    const playerPosition = this.view.state.player.position.current
+    const playerPosition = this.view.state.player.position
     const sunState = this.view.state.sun
     const uniforms = this.material.uniforms
 

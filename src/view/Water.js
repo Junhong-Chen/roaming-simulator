@@ -1,6 +1,6 @@
 import { DoubleSide, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, TextureLoader, Vector3, Vector4, WebGLRenderTarget } from "three"
 import WaterMaterial from "../materials/WaterMaterial"
-import { remap } from "../utils/utils"
+import { smoothstep } from "../utils/utils"
 
 export default class Water extends Mesh {
   constructor(view) {
@@ -36,7 +36,8 @@ export default class Water extends Mesh {
 
     const mirrorCamera = new PerspectiveCamera()
 
-    const renderTarget = new WebGLRenderTarget(this.view.viewport.width, this.view.viewport.height)
+    const { width, height } = this.view.viewport
+    const renderTarget = this.renderTarget = new WebGLRenderTarget(width, height)
 
     const material = this.material = new WaterMaterial({
       fog: view.scene.fog !== undefined
@@ -199,19 +200,20 @@ export default class Water extends Mesh {
 
     // 同步水面位置
     this.position.set(
-      playerState.position.current[0],
+      playerState.position[0],
       0,
-      playerState.position.current[2]
+      playerState.position[2]
     )
-
-    // 查看纹理
-    // this.shadowMapMaterial.needsUpdate = true
 
     const uniforms = this.material.uniforms
     uniforms.time.value = clock.elapsed * 0.1
+    uniforms.distortionScale.value = smoothstep(3, 10, playerState.camera.position[1]) * 0.5 + 0.175
+
+    // 查看纹理
+    // this.shadowMapMaterial.needsUpdate = true
   }
 
-  resize() {
-    this.renderTarget.setSize(this.view.viewport.width, this.view.viewport.height)
+  resize(width, height) {
+    this.renderTarget.setSize(width, height)
   }
 }

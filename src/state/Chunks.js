@@ -57,7 +57,7 @@ export default class Chunks extends EventEmitter {
   update() {
     // Check only if player coordinates changed to another minimal chunk（检查玩家是否移动到新的地块）
     const player = this.state.player
-    const playerChunkKey = `${Math.round(player.position.current[0] / this.minSize * 2 + 0.5)}${Math.round(player.position.current[2] / this.minSize * 2 + 0.5)}`
+    const playerChunkKey = `${Math.round(player.position[0] / this.minSize * 2 + 0.5)}${Math.round(player.position[2] / this.minSize * 2 + 0.5)}`
 
     if (playerChunkKey !== this.playerChunkKey) {
       this.playerChunkKey = playerChunkKey
@@ -206,8 +206,8 @@ export default class Chunks extends EventEmitter {
   // 计算并返回玩家周围的主要地形块坐标。这些坐标用于生成和维护与玩家接近的地形块。
   getMainChunksCoordinates() {
     const player = this.state.player
-    const currentX = Math.round(player.position.current[0] / this.maxSize)
-    const currentZ = Math.round(player.position.current[2] / this.maxSize)
+    const currentX = Math.round(player.position[0] / this.maxSize)
+    const currentZ = Math.round(player.position[2] / this.maxSize)
 
     // Find normalize neighbours
     const mainChunksCoordinates = [
@@ -237,7 +237,7 @@ export default class Chunks extends EventEmitter {
   // 根据玩家与地形块的距离判断是否需要进一步划分块
   underSplitDistance(size, chunkX, chunkY) {
     const player = this.state.player
-    const distance = Math.hypot(player.position.current[0] - chunkX, player.position.current[2] - chunkY)
+    const distance = Math.hypot(player.position[0] - chunkX, player.position[2] - chunkY)
     return distance < size * this.splitRatioPerSize
   }
 

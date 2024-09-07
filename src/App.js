@@ -43,7 +43,7 @@ export default class App {
   resize = () => {
     const { width, height, pixelRatio } = this.viewport
     this.renderer.resize(width, height, pixelRatio)
-    this.view.camera.resize(width, height)
+    this.view.resize(width, height, pixelRatio)
   }
 
   destroy = (e) => {

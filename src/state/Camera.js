@@ -255,13 +255,13 @@ export class CameraThirdPerson {
       Math.cos(this.phi) * this.distance,
       sinPhiRadius * Math.cos(this.theta)
     )
-    vec3.add(this.position, player.position.current, sphericalPosition)
+    vec3.add(this.position, player.position, sphericalPosition)
 
     // Target
     const target = vec3.fromValues(
-      player.position.current[0],
-      player.position.current[1] + this.aboveOffset,
-      player.position.current[2]
+      player.position[0],
+      player.position[1] + this.aboveOffset,
+      player.position[2]
     )
 
     // Quaternion

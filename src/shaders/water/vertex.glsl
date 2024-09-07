@@ -1,20 +1,19 @@
 uniform mat4 textureMatrix;
+uniform float time;
 
-varying vec4 mirrorCoord;
+varying vec4 vMirrorCoord;
 varying vec2 vUv;
 
 #include <common>
-varying vec4 worldPosition;
 #include <fog_pars_vertex>
 #include <shadowmap_pars_vertex>
 #include <logdepthbuf_pars_vertex>
 
 void main() {
-  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-  gl_Position = projectionMatrix * mvPosition;
+  vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * viewMatrix * worldPosition;
 
-  mirrorCoord = textureMatrix * modelMatrix * vec4(position, 1.0);
-  worldPosition = mirrorCoord.xyzw;
+  vMirrorCoord = textureMatrix * worldPosition;
   vUv = uv;
 
   #include <beginnormal_vertex>

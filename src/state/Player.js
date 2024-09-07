@@ -1,6 +1,7 @@
 import { vec3 } from "gl-matrix"
 import EventEmitter from "../core/EventEmitter.js"
 import Camera from "./Camera.js"
+import { MathUtils } from "three"
 
 const ACTIONS = {
   RUNNING: 'running',
@@ -22,11 +23,11 @@ export default class Player extends EventEmitter {
     this.inputSpeed = 2
     this.inputBoostSpeed = 4
     this.speed = 0
+    this.realSpeed = 0
 
-    this.position = {}
-    this.position.current = vec3.fromValues(0, 0, 0)
-    this.position.previous = vec3.clone(this.position.current)
-    this.position.delta = vec3.create()
+    this.position = vec3.create()
+    // this.positionPrevious = vec3.clone(this.position)
+    // this.positionDelta = vec3.create()
 
     this.action = ACTIONS.IDLE
     this.beforeAction = this.action
@@ -37,9 +38,10 @@ export default class Player extends EventEmitter {
   update() {
     const controls = this.state.controls
     this.beforeAction = this.action
+    const cameraFly = this.camera.mode === Camera.MODE_FLY
 
-    if (controls.keys.down.forward || controls.keys.down.backward || controls.keys.down.strafeLeft || controls.keys.down.strafeRight) {
-      this.rotation = this.camera.thirdPerson.theta % (Math.PI * 2)
+    if (!cameraFly && (controls.keys.down.forward || controls.keys.down.backward || controls.keys.down.strafeLeft || controls.keys.down.strafeRight)) {
+      this.rotation = this.camera.thirdPerson.theta
 
       if (controls.keys.down.forward) {
         if (controls.keys.down.strafeLeft)
@@ -53,7 +55,7 @@ export default class Player extends EventEmitter {
         else if (controls.keys.down.strafeRight)
           this.rotation -= Math.PI * 0.75
         else
-          this.rotation -= Math.PI
+          this.rotation += Math.PI
       }
       else if (controls.keys.down.strafeLeft) {
         this.rotation += Math.PI * 0.5
@@ -62,13 +64,17 @@ export default class Player extends EventEmitter {
         this.rotation -= Math.PI * 0.5
       }
 
-      const speed = controls.keys.down.boost ? this.inputBoostSpeed : this.inputSpeed
+      let speed = controls.keys.down.boost ? this.inputBoostSpeed : this.inputSpeed
+      if (Math.abs(speed - this.speed) > 0.01) {
+        speed = MathUtils.lerp(this.speed, speed, 0.05)
+        this.speed = speed
+      }
 
       const x = Math.sin(this.rotation) * this.state.clock.delta * speed
       const z = Math.cos(this.rotation) * this.state.clock.delta * speed
 
-      this.position.current[0] -= x
-      this.position.current[2] -= z
+      this.position[0] -= x
+      this.position[2] -= z
 
       if (controls.keys.down.boost) {
         this.action = ACTIONS.RUNNING
@@ -77,26 +83,27 @@ export default class Player extends EventEmitter {
       }
     } else {
       this.action = ACTIONS.IDLE
+      this.speed = 0
     }
 
     if (this.beforeAction !== this.action)
       this.emit('action', { before: this.beforeAction, current: this.action })
 
-    vec3.sub(this.position.delta, this.position.current, this.position.previous)
-    vec3.copy(this.position.previous, this.position.current)
-
-    this.speed = vec3.len(this.position.delta)
+    // 计算实时速度（暂时用不上）
+    // vec3.sub(this.positionDelta, this.position, this.positionPrevious)
+    // vec3.copy(this.positionPrevious, this.position)
+    // this.realSpeed = vec3.len(this.positionDelta)
 
     // Update view
     this.camera.update()
 
     // Update elevation
     const chunks = this.state.chunks
-    const elevation = chunks.getElevationForPosition(this.position.current[0], this.position.current[2])
+    const elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
 
     if (elevation && elevation > -0.5)
-      this.position.current[1] = elevation
+      this.position[1] = elevation
     else
-      this.position.current[1] = -0.5
+      this.position[1] = -0.5
   }
 }

@@ -5,7 +5,7 @@ export default class Day {
     this.autoUpdate = true
     this.timeProgress = 0
     this.progress = 0
-    this.duration = 30 // Seconds
+    this.duration = 120 // Seconds
 
     this.setDebug()
   }

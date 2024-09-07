@@ -63,19 +63,21 @@ export default class Player {
     if (this.mixer) this.mixer.update(deltaTime)
 
     const { position, rotation } = this.state.player
-    this.group.position.set(...position.current)
+    this.group.position.set(...position)
 
     if (this.model) {
-      let targetRotation = rotation - Math.PI
-      // 计算角度差
-      let diffRotation = targetRotation - this.model.rotation.y
-      if (diffRotation > Math.PI) {
-        targetRotation -= 2 * Math.PI
-      } else if (diffRotation < -Math.PI) {
-        targetRotation += 2 * Math.PI
-      }
+      let targetRotation = rotation - Math.PI // 使角色模型面朝前方
   
-      this.model.rotation.y = MathUtils.lerp(this.model.rotation.y, targetRotation, 0.1)
+      // 计算角度差，并将其限制在 [-π, π] 之间
+      let diffRotation = (targetRotation - this.model.rotation.y) % (Math.PI * 2)
+      if (diffRotation > Math.PI) {
+        diffRotation -= 2 * Math.PI
+      } else if (diffRotation < -Math.PI) {
+        diffRotation += 2 * Math.PI
+      }
+    
+      // 更新 model 的旋转角度，以最小角度旋转
+      this.model.rotation.y = MathUtils.lerp(this.model.rotation.y, this.model.rotation.y + diffRotation, 0.1)
     }
   }
 

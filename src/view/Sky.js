@@ -155,9 +155,9 @@ export default class Sky {
 
     // Group
     this.group.position.set(
-      playerState.position.current[0],
-      playerState.position.current[1],
-      playerState.position.current[2]
+      playerState.position[0],
+      playerState.position[1],
+      playerState.position[2]
     )
 
     // Sun
@@ -167,9 +167,9 @@ export default class Sky {
       sunState.position.z * this.sun.distance
     )
     this.sun.mesh.lookAt(
-      playerState.position.current[0],
-      playerState.position.current[1],
-      playerState.position.current[2]
+      playerState.position[0],
+      playerState.position[1],
+      playerState.position[2]
     )
 
     // Stars
@@ -178,9 +178,7 @@ export default class Sky {
     starsUniforms.uHeightFragments.value = this.view.viewport.height * this.view.viewport.pixelRatio
   }
 
-  resize() {
-    const { width, height } = this.view.viewport
-
+  resize(width, height) {
     this.auroras.mesh.material.uniforms.uResolution.value.set(width, height)
   }
 }
