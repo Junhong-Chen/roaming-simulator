@@ -40,10 +40,12 @@ export default class Player {
     // this.setActionWeight(this.actions[this.state.player.action], 1)
     this.setActionWeight(this.actions[this.state.player.action], 1)
 
-    this.state.player.on('action', e => {
-      const before = this.actions[e.before]
-      const current = this.actions[e.current]
-      this.changeAction(before, current)
+    this.state.player.on('action', ({ before, current }) => {
+      this.changeAction(this.actions[before], this.actions[current])
+    })
+
+    this.state.player.on('actionTimeScale', ({ timeScale }) => {
+      this.mixer.timeScale = timeScale
     })
   }
 

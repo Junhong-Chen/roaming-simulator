@@ -7,51 +7,37 @@ export default class Water extends Mesh {
     super(new PlaneGeometry(2048, 2048))
     this.view = view
 
-    const clipBias = 0
-    const alpha = 0.75
-    const normalSampler = new TextureLoader().load('textures/waternormals.jpg', function (texture) {
-
-      texture.wrapS = texture.wrapT = RepeatWrapping
-
-    })
-    const sunDirection = new Vector3(0.70707, 0.70707, 0.0)
-    const sunColor = 0xffffff
-    const waterColor = 0x66a8ff
-    const eye = new Vector3(0, 0, 0)
-    // const sky = view.sky.background
-
-    const mirrorPlane = new Plane()
-    const normal = new Vector3()
-    const mirrorWorldPosition = new Vector3()
-    const cameraWorldPosition = new Vector3()
-    const rotationMatrix = new Matrix4()
-    const lookAtPosition = new Vector3(0, 0, - 1)
-    const clipPlane = new Vector4()
-
-    const v = new Vector3() // 视线向量
-    const target = new Vector3()
-    const q = new Vector4()
-
-    const textureMatrix = new Matrix4()
-
-    const mirrorCamera = new PerspectiveCamera()
-
     const { width, height } = this.view.viewport
     const renderTarget = this.renderTarget = new WebGLRenderTarget(width, height)
+
+    const normalSampler = new TextureLoader().load('textures/waternormals.jpg', function (texture) {
+      texture.wrapS = texture.wrapT = RepeatWrapping
+    })
 
     const material = this.material = new WaterMaterial({
       fog: view.scene.fog !== undefined
     })
 
     material.uniforms.mirrorSampler.value = renderTarget.texture
-    material.uniforms.textureMatrix.value = textureMatrix
-    material.uniforms.alpha.value = alpha
     material.uniforms.normalSampler.value = normalSampler
-    material.uniforms.sunColor.value = sunColor
-    material.uniforms.waterColor.value = waterColor
-    material.uniforms.sunDirection.value = sunDirection
-    material.uniforms.distortionScale.value = 0.175 // 倒影失真系数
-    material.uniforms.eye.value = eye
+
+    const mirrorCamera = new PerspectiveCamera() // 镜像相机
+    const mirrorPlane = new Plane() // 镜像屏幕
+    const mirrorWorldPosition = new Vector3()
+    const cameraWorldPosition = new Vector3()
+    const rotationMatrix = new Matrix4()
+    const lookAtPosition = new Vector3(0, 0, - 1)
+    const normal = new Vector3(0, 1, 0) // 水面法线
+
+    const clipPlane = new Vector4()
+    const clipBias = 0
+
+    const v = new Vector3() // 视线向量
+    const target = new Vector3()
+    const q = new Vector4()
+
+    const textureMatrix = material.uniforms.textureMatrix.value
+    const eye = material.uniforms.eye.value
 
     const scope = this
     this.onBeforeRender = function (renderer, scene, camera) {
@@ -61,7 +47,7 @@ export default class Water extends Mesh {
 
       rotationMatrix.extractRotation(scope.matrixWorld) // 获取水面旋转矩阵，忽略平移和缩放部分。这一步是为了后续计算法线方向
 
-      normal.set(0, 1, 0) // 水面的法线
+      normal.set(0, 1, 0)
       normal.applyMatrix4(rotationMatrix) // 使其与水面的旋转一致
 
       v.subVectors(mirrorWorldPosition, cameraWorldPosition) // 相机位置到水面中心的视线向量
@@ -175,10 +161,7 @@ export default class Water extends Mesh {
     view.scene.add(this)
 
     // this.createMapMesh()
-  }
-
-  setCustomRender() {
-
+    this.setDebug()
   }
 
   createMapMesh() {
@@ -197,6 +180,7 @@ export default class Water extends Mesh {
   update() {
     const playerState = this.view.state.player
     const clock = this.view.clock
+    const sunState = this.view.state.sun
 
     // 同步水面位置
     this.position.set(
@@ -206,11 +190,28 @@ export default class Water extends Mesh {
     )
 
     const uniforms = this.material.uniforms
-    uniforms.time.value = clock.elapsed * 0.1
+    uniforms.time.value = clock.elapsed
     uniforms.distortionScale.value = smoothstep(3, 10, playerState.camera.position[1]) * 0.5 + 0.175
+    uniforms.uIntensity.value = sunState.intensity
 
     // 查看纹理
     // this.shadowMapMaterial.needsUpdate = true
+  }
+
+  setDebug() {
+    const debug = this.view.debug
+    if (!debug.gui)
+      return
+
+    const debugObj = {
+      logDistortion: () => {
+        console.log(this.material.uniforms.distortionScale.value)
+      }
+    }
+    const waterFolder = debug.getFolder('view/water')
+
+    waterFolder.add(debugObj, 'logDistortion')
+
   }
 
   resize(width, height) {

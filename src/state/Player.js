@@ -33,13 +33,29 @@ export default class Player extends EventEmitter {
     this.beforeAction = this.action
 
     this.camera = new Camera(state)
+
+    this.actionTimeScale = 1
   }
 
   update() {
     const controls = this.state.controls
     this.beforeAction = this.action
     const cameraFly = this.camera.mode === Camera.MODE_FLY
+    const chunks = this.state.chunks
+    const elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
+    let swimming = false
+    let timeScale = 1
 
+    // Update elevation
+    if (elevation && elevation > -1)
+      this.position[1] = elevation
+    else {
+      this.position[1] = -1
+      swimming = true
+    }
+
+    // Moving
+    const boost = controls.keys.down.boost
     if (!cameraFly && (controls.keys.down.forward || controls.keys.down.backward || controls.keys.down.strafeLeft || controls.keys.down.strafeRight)) {
       this.rotation = this.camera.thirdPerson.theta
 
@@ -64,7 +80,7 @@ export default class Player extends EventEmitter {
         this.rotation -= Math.PI * 0.5
       }
 
-      let speed = controls.keys.down.boost ? this.inputBoostSpeed : this.inputSpeed
+      let speed = boost ? this.inputBoostSpeed : this.inputSpeed
       if (Math.abs(speed - this.speed) > 0.01) {
         speed = MathUtils.lerp(this.speed, speed, 0.05)
         this.speed = speed
@@ -76,18 +92,16 @@ export default class Player extends EventEmitter {
       this.position[0] -= x
       this.position[2] -= z
 
-      if (controls.keys.down.boost) {
-        this.action = ACTIONS.RUNNING
+      // 角色动作
+      if (swimming) {
+        this.action = ACTIONS.SWIMMING
       } else {
-        this.action = ACTIONS.WALKING
+        this.action = boost ? ACTIONS.RUNNING : ACTIONS.WALKING
       }
     } else {
-      this.action = ACTIONS.IDLE
+      this.action = swimming ? ACTIONS.TREADING_WATER : ACTIONS.IDLE
       this.speed = 0
     }
-
-    if (this.beforeAction !== this.action)
-      this.emit('action', { before: this.beforeAction, current: this.action })
 
     // 计算实时速度（暂时用不上）
     // vec3.sub(this.positionDelta, this.position, this.positionPrevious)
@@ -97,13 +111,17 @@ export default class Player extends EventEmitter {
     // Update view
     this.camera.update()
 
-    // Update elevation
-    const chunks = this.state.chunks
-    const elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
+    // 更新角色动作
+    if (this.beforeAction !== this.action)
+      this.emit('action', { before: this.beforeAction, current: this.action })
 
-    if (elevation && elevation > -0.5)
-      this.position[1] = elevation
-    else
-      this.position[1] = -0.5
+    // 更新动作速度
+    if (swimming) {
+      timeScale = boost ? 1.5 : 1
+    }
+    if (timeScale !== this.actionTimeScale) {
+      this.emit('actionTimeScale', { timeScale })
+      this.actionTimeScale = timeScale
+    }
   }
 }
