@@ -47,7 +47,7 @@ export default class Player extends EventEmitter {
     let timeScale = 1
 
     // Update elevation
-    if (elevation && elevation > -1)
+    if (elevation && elevation > -1 - 0.01) // EPSILON
       this.position[1] = elevation
     else {
       this.position[1] = -1

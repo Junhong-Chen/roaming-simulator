@@ -7,8 +7,7 @@ export default class Water extends Mesh {
     super(new PlaneGeometry(2048, 2048))
     this.view = view
 
-    const { width, height } = this.view.viewport
-    const renderTarget = this.renderTarget = new WebGLRenderTarget(width, height)
+    const renderTarget = this.createRendererTarget()
 
     const normalSampler = new TextureLoader().load('textures/waternormals.jpg', function (texture) {
       texture.wrapS = texture.wrapT = RepeatWrapping
@@ -177,6 +176,20 @@ export default class Water extends Mesh {
     this.view.scene.add(shadowMapPlane)
   }
 
+  createRendererTarget() {
+    const { width, height } = this.view.viewport
+    this.renderTarget = new WebGLRenderTarget(width, height)
+    return this.renderTarget
+  }
+
+  createWaveTexture() {
+
+  }
+
+  resize(width, height) {
+    this.renderTarget.setSize(width, height)
+  }
+
   update() {
     const playerState = this.view.state.player
     const clock = this.view.clock
@@ -211,10 +224,5 @@ export default class Water extends Mesh {
     const waterFolder = debug.getFolder('view/water')
 
     waterFolder.add(debugObj, 'logDistortion')
-
-  }
-
-  resize(width, height) {
-    this.renderTarget.setSize(width, height)
   }
 }

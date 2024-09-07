@@ -15,7 +15,7 @@ export default class TerrainMaterial extends ShaderMaterial {
         uIntensity: new Uniform(1)
       },
       vertexShader,
-      fragmentShader
+      fragmentShader,
     })
   }
 }

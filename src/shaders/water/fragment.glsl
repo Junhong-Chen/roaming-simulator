@@ -13,7 +13,7 @@ varying vec2 vUv;
 
 vec4 getNoise(vec2 uv, float time) {
   // 避免时间增长导致噪声变化变小
-  time = (sin(time * .01)) * 10.;
+  time = (sin(time * .01)) * 10.; // -10 ~ 10
 
   vec2 uv0 = (uv / 103.0) + vec2(time / 17.0, time / 29.0);
   vec2 uv1 = uv / 107.0 - vec2(time / -19.0, time / 31.0);
@@ -43,6 +43,7 @@ void main() {
   vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / d) * distortionScale * t;
   vec3 reflectionSample = vec3(texture2D(mirrorSampler, vMirrorCoord.xy / vMirrorCoord.w + distortion));
 
+  // 浪花
   float spray = 1. - dot(surfaceNormal, vec3(0., 1., 0.));
   spray = step(.1, spray) * smoothstep(-.5, 1.2, uIntensity);
 

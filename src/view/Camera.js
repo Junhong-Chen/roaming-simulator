@@ -2,7 +2,7 @@ import { PerspectiveCamera } from "three"
 
 export default class Camera extends PerspectiveCamera {
   constructor(view) {
-    super(75, 1, 0.1, 1000)
+    super(75, 1, 1, 1000) // 深度缓冲区的精度分布与 近剪裁面（near）和远剪裁面（far）的比值 相关
 
     this.view = view
     this.rotation.reorder('YXZ')
