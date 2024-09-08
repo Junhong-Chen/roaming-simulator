@@ -26,8 +26,8 @@ export default class Player extends EventEmitter {
     this.realSpeed = 0
 
     this.position = vec3.create()
-    // this.positionPrevious = vec3.clone(this.position)
-    // this.positionDelta = vec3.create()
+    this.positionPrevious = vec3.clone(this.position)
+    this.positionDelta = vec3.create()
 
     this.action = ACTIONS.IDLE
     this.beforeAction = this.action
@@ -103,9 +103,9 @@ export default class Player extends EventEmitter {
       this.speed = 0
     }
 
+    vec3.sub(this.positionDelta, this.position, this.positionPrevious)
+    vec3.copy(this.positionPrevious, this.position)
     // 计算实时速度（暂时用不上）
-    // vec3.sub(this.positionDelta, this.position, this.positionPrevious)
-    // vec3.copy(this.positionPrevious, this.position)
     // this.realSpeed = vec3.len(this.positionDelta)
 
     // Update view

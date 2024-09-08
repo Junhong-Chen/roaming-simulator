@@ -6,6 +6,7 @@ import fragmentShader from "../shaders/grass/fragment.glsl"
 export default class GrassMaterial extends ShaderMaterial {
   constructor() {
     super({
+      name: 'GrassMaterial',
       uniforms: {
         uTime: new Uniform(null),
         uGrassDistance: new Uniform(null),

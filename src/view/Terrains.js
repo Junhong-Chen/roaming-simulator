@@ -39,7 +39,7 @@ export default class Terrains {
     const uniforms = this.material.uniforms
 
     uniforms.uPlayerPosition.value.set(...playerPosition)
-    uniforms.uSunPosition.value.copy(sunState.position)
+    uniforms.uSunPosition.value.set(...sunState.position)
     uniforms.uIntensity.value = sunState.intensity
 
     const light = this.view.light.playerLight

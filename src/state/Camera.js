@@ -273,12 +273,12 @@ export class CameraThirdPerson {
     const chunks = this.state.chunks
     let elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
 
-    // 相机可设置最低海拔为 -0.5 时
-    const low = -0.5
+    // 相机可参照最低海拔
+    const low = 0
     if (elevation < low) elevation = low
 
-    // 相机位置始终高于地形位置 1 个高度
-    if (this.position[1] < elevation + 1) // EPSILON
-      this.position[1] = elevation + 1
+    // 相机位置始终高于地形位置 1.25 个高度
+    if (this.position[1] < elevation + 1.25) // EPSILON
+      this.position[1] = elevation + 1.25
   }
 }

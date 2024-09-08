@@ -145,7 +145,7 @@ export default class Sky {
     const camera = this.view.camera
 
     // Background
-    this.background.mesh.material.uniforms.sunPosition.value.copy(sunState.position)
+    this.background.mesh.material.uniforms.sunPosition.value.set(...sunState.position)
 
     // Auroras
     const aurorasUniforms = this.auroras.mesh.material.uniforms
@@ -162,9 +162,9 @@ export default class Sky {
 
     // Sun
     this.sun.mesh.position.set(
-      sunState.position.x * this.sun.distance,
-      sunState.position.y * this.sun.distance,
-      sunState.position.z * this.sun.distance
+      sunState.position[0] * this.sun.distance,
+      sunState.position[1] * this.sun.distance,
+      sunState.position[2] * this.sun.distance
     )
     this.sun.mesh.lookAt(
       playerState.position[0],
@@ -174,7 +174,7 @@ export default class Sky {
 
     // Stars
     const starsUniforms = this.stars.material.uniforms
-    starsUniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
+    starsUniforms.uSunPosition.value.set(sunState.position[0], sunState.position[1], sunState.position[2])
     starsUniforms.uHeightFragments.value = this.view.viewport.height * this.view.viewport.pixelRatio
   }
 

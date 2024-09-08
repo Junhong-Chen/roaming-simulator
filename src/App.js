@@ -36,8 +36,8 @@ export default class App {
 
   update = ({ deltaTime, elapsedTime }) => {
     this.renderer.update(this.scene, this.view.camera)
-    this.view.update(deltaTime, elapsedTime)
     this.state.update(deltaTime, elapsedTime)
+    this.view.update(deltaTime, elapsedTime)
   }
 
   resize = () => {

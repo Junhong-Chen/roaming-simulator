@@ -4,10 +4,12 @@ import Player from "./Player"
 import Terrains from "./Terrains"
 import Controls from "./Controls"
 import Chunks from "./Chunks"
+import Water from "./Water"
 
 
 export default class State {
   constructor(app) {
+    this.app = app
     this.debug = app.debug
     this.clock = app.clock
     this.viewport = app.viewport
@@ -18,6 +20,7 @@ export default class State {
     this.player = new Player(this)
     this.chunks = new Chunks(this)
     this.terrains = new Terrains(this)
+    this.water = new Water(this)
   }
 
   update() {
@@ -26,6 +29,7 @@ export default class State {
     this.sun.update()
     this.player.update()
     this.chunks.update()
+    this.water.update()
   }
 
   destroy() {}

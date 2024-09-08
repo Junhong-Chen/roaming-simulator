@@ -1,5 +1,5 @@
-import { Vector3 } from "three"
 import { remap } from "../utils/utils"
+import { vec3 } from "gl-matrix"
 
 export default class Sun {
   constructor(state) {
@@ -7,10 +7,10 @@ export default class Sun {
 
     this.theta = Math.PI * 0.8 // All around the sphere
     this.phi = Math.PI * 0.45 // Elevation
-    this.position = new Vector3()
+    this.position = vec3.create()
 
     this.intensity = 1 // Radiant intensity
-    this.up = new Vector3(0, 1, 0)
+    this.up = vec3.fromValues(0, 1, 0)
   }
 
   update() {
@@ -22,12 +22,12 @@ export default class Sun {
 
     const sinPhiRadius = Math.sin(this.phi)
 
-    this.position.x = sinPhiRadius * Math.sin(this.theta)
-    this.position.y = Math.cos(this.phi)
-    this.position.z = sinPhiRadius * Math.cos(this.theta)
+    this.position[0] = sinPhiRadius * Math.sin(this.theta)
+    this.position[1] = Math.cos(this.phi)
+    this.position[2] = sinPhiRadius * Math.cos(this.theta)
 
     this.intensity = remap(
-      this.position.clone().normalize().dot(this.up),
+      vec3.dot(this.up, vec3.normalize(vec3.create(), this.position)),
       -1, 1, 0, 1
     )
   }

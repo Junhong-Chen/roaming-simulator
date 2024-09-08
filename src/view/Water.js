@@ -1,13 +1,19 @@
-import { DoubleSide, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, TextureLoader, Vector3, Vector4, WebGLRenderTarget } from "three"
-import WaterMaterial from "../materials/WaterMaterial"
+import { LinearFilter, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, TextureLoader, Uniform, Vector2, Vector3, Vector4, WebGLRenderTarget } from "three"
 import { smoothstep } from "../utils/utils"
+import { GPUComputationRenderer } from "three/examples/jsm/Addons.js"
+
+import WaterMaterial from "../materials/WaterMaterial"
+import waveShader from "../shaders/water/wave.glsl"
 
 export default class Water extends Mesh {
   constructor(view) {
-    super(new PlaneGeometry(2048, 2048))
+    const waterSize = view.state.water.size.water
+    super(new PlaneGeometry(waterSize, waterSize))
     this.view = view
 
     const renderTarget = this.createRendererTarget()
+
+    this.createWaveTexture()
 
     const normalSampler = new TextureLoader().load('textures/waternormals.jpg', function (texture) {
       texture.wrapS = texture.wrapT = RepeatWrapping
@@ -156,24 +162,10 @@ export default class Water extends Mesh {
 
     }
 
-    this.geometry.rotateX(- Math.PI * 0.5)
+    this.geometry.rotateX(-Math.PI * 0.5)
     view.scene.add(this)
 
-    // this.createMapMesh()
     this.setDebug()
-  }
-
-  createMapMesh() {
-    // 查看 map
-    // 创建一个平面几何体来显示 shadowMap
-    const planeGeometry = new PlaneGeometry(10, 10)
-    this.shadowMapMaterial = new MeshBasicMaterial({ side: DoubleSide })
-    this.shadowMapMaterial.map = this.waterMesh.renderTarget.texture
-
-    // 创建平面网格并添加到场景中
-    const shadowMapPlane = new Mesh(planeGeometry, this.shadowMapMaterial)
-    shadowMapPlane.position.set(0, 8, 0) // 设置平面的位置，以便在场景中看到它
-    this.view.scene.add(shadowMapPlane)
   }
 
   createRendererTarget() {
@@ -183,7 +175,39 @@ export default class Water extends Mesh {
   }
 
   createWaveTexture() {
+    const size = 512 // 纹理大小
+    const gpgpu = this.gpgpu = {
+      size
+    }
+    gpgpu.computation = new GPUComputationRenderer(size, size, this.view.renderer)
 
+    const texture = gpgpu.computation.createTexture()
+    const color = texture.image.data
+    for (let i = 0; i < size * size; i++) {
+      const k = i * 4
+      // texture 中每个像素包含 RBGA 四个值，RG 分别表示当前帧与前一帧的值， BA 表示当前玩家位置
+      color[k + 0] = 0
+      color[k + 1] = 0
+      color[k + 2] = 0
+      color[k + 3] = 0
+    }
+
+    // 将纹理注入到 shader 中
+    gpgpu.waveVariable = gpgpu.computation.addVariable('uWaveTexture', waveShader, texture)
+
+    const uniforms = gpgpu.waveVariable.material.uniforms
+    uniforms.uTime = new Uniform(0)
+    uniforms.uPlayerUv = new Uniform(new Vector2())
+
+    // 将变量自己作为依赖项，将现在的状态发送到下一次计算中，达到数据可持续化的效果
+    gpgpu.computation.setVariableDependencies(gpgpu.waveVariable, [gpgpu.waveVariable])
+    gpgpu.computation.init()
+
+    // 降低更新频率
+    this.timer = setInterval(() => {
+      this.gpgpu.computation.compute()
+    }, 66.66)
+    
   }
 
   resize(width, height) {
@@ -194,21 +218,20 @@ export default class Water extends Mesh {
     const playerState = this.view.state.player
     const clock = this.view.clock
     const sunState = this.view.state.sun
+    const waterSate = this.view.state.water
 
-    // 同步水面位置
-    this.position.set(
-      playerState.position[0],
-      0,
-      playerState.position[2]
-    )
-
+    // GPGPU update
+    const waveUniforms = this.gpgpu.waveVariable.material.uniforms
+    waveUniforms.uPlayerUv.value.set(...waterSate.playerUv)
+    // this.gpgpu.computation.compute()
+    
     const uniforms = this.material.uniforms
     uniforms.time.value = clock.elapsed
     uniforms.distortionScale.value = smoothstep(3, 10, playerState.camera.position[1]) * 0.5 + 0.175
     uniforms.uIntensity.value = sunState.intensity
+    uniforms.uWaveTexture.value = this.gpgpu.computation.getCurrentRenderTarget(this.gpgpu.waveVariable).texture
 
-    // 查看纹理
-    // this.shadowMapMaterial.needsUpdate = true
+    this.position.set(...waterSate.position)
   }
 
   setDebug() {
@@ -224,5 +247,12 @@ export default class Water extends Mesh {
     const waterFolder = debug.getFolder('view/water')
 
     waterFolder.add(debugObj, 'logDistortion')
+  }
+
+  destroy() {
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
   }
 }

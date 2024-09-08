@@ -6,6 +6,7 @@ import fragmentShader from "../shaders/player/fragment.glsl"
 export default class PlayerMaterial extends ShaderMaterial {
   constructor() {
     super({
+      name: 'NoisesMaterial',
       uniforms:
       {
         uSunPosition: new Uniform(null)

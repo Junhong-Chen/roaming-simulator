@@ -6,12 +6,13 @@ uniform float distortionScale;
 uniform sampler2D normalSampler;
 uniform vec3 eye;
 uniform float uIntensity;
+uniform sampler2D uWaveTexture;
 
 varying vec4 vMirrorCoord;
 varying vec4 vWorldPosition;
 varying vec2 vUv;
 
-vec4 getNoise(vec2 uv, float time) {
+vec4 timeNoise(vec2 uv, float time) {
   // 避免时间增长导致噪声变化变小
   time = (sin(time * .01)) * 10.; // -10 ~ 10
 
@@ -29,10 +30,34 @@ vec4 getNoise(vec2 uv, float time) {
   return noise * 0.5 - 1.0;
 }
 
-void main() {
+// 简单的噪声函数
+float simpleNoise(vec2 uv) {
+  return fract(sin(dot(uv.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
 
-  #include <logdepthbuf_fragment>
-  vec4 noise = getNoise(vWorldPosition.xz * size, time);
+vec4 bilinearInterpolation(sampler2D t, vec2 uv, float texelSize) {
+  // 计算纹理坐标所在像素的左下角坐标
+  vec2 uvMin = floor(uv / texelSize) * texelSize;
+  // 计算右上角的偏移坐标
+  vec2 uvMax = uvMin + vec2(texelSize, texelSize);
+  
+  // 计算插值权重
+  vec2 f = (uv - uvMin) / texelSize;
+  
+  // 获取四个邻近像素的颜色值
+  float bl = texture2D(t, uvMin).r; // 左下
+  float br = texture2D(t, vec2(uvMax.x, uvMin.y)).r; // 右下
+  float tl = texture2D(t, vec2(uvMin.x, uvMax.y)).r; // 左上
+  float tr = texture2D(t, uvMax).r; // 右上
+
+  // 使用双线性插值计算最终的颜色值
+  float bottom = mix(bl, br, f.x); // 对 x 方向进行线性插值
+  float top = mix(tl, tr, f.x);    // 对 x 方向进行线性插值
+  return vec4(mix(bottom, top, f.y)); // 对 y 方向进行线性插值
+}
+
+void main() {
+  vec4 noise = timeNoise(vWorldPosition.xz * size, time);
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
   vec3 worldToEye = eye - vMirrorCoord.xyz;
@@ -43,11 +68,34 @@ void main() {
   vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / d) * distortionScale * t;
   vec3 reflectionSample = vec3(texture2D(mirrorSampler, vMirrorCoord.xy / vMirrorCoord.w + distortion));
 
+  float intensity = smoothstep(-.5, 1.2, uIntensity);
   // 浪花
   float spray = 1. - dot(surfaceNormal, vec3(0., 1., 0.));
-  spray = step(.1, spray) * smoothstep(-.5, 1.2, uIntensity);
+  spray = step(.1, spray) * intensity;
 
-  vec3 color = reflectionSample + spray;
+  // 波纹
+  float scale = pow(1. / 8., 2.);
+  vec2 minUv = vec2(0.5 - scale);
+  vec2 maxUv = vec2(1.0 - minUv.x, 1.0 - minUv.y);
+  float wave;
 
-  gl_FragColor = vec4(color, alpha);
+  // 判断当前 UV 是否在中心区域内
+  if (spray <= 0. && vUv.x > minUv.x && vUv.x < maxUv.x && vUv.y > minUv.y && vUv.y < maxUv.y) {
+    // 将中心区域的 UV 映射到 [0, 1] 范围内
+    vec2 centeredUv = (vUv - minUv) / (maxUv - minUv);
+
+    float wCell = 1. / 256.; // 波纹纹理的单个像素大小
+
+    wave = bilinearInterpolation(uWaveTexture, centeredUv, wCell).r;
+
+    // 截取值范围
+    float minRange = 0.1;
+    float maxRange = 0.2;
+    wave = clamp((wave - minRange) / (maxRange - minRange), 0.0, 1.0);
+    wave = step(minRange, wave) * intensity;
+  }
+
+  vec3 color = reflectionSample + spray + wave;
+
+  gl_FragColor = vec4(color, 1.0);
 }

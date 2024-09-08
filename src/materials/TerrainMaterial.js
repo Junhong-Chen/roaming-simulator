@@ -6,6 +6,7 @@ import fragmentShader from "../shaders/terrain-material/fragment.glsl"
 export default class TerrainMaterial extends ShaderMaterial {
   constructor() {
     super({
+      name: 'TerrainMaterial',
       uniforms: {
         uPlayerPosition: new Uniform(null),
         uShadowMapTexture: new Uniform(null),

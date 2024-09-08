@@ -6,6 +6,7 @@ import fragmentShader from "../shaders/stars/fragment.glsl"
 export default class StarsMaterial extends ShaderMaterial {
   constructor() {
     super({
+      name: 'StarsMaterial',
       uniforms:
       {
         uSunPosition: new Uniform(new Vector3()),
