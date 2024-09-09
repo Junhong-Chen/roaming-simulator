@@ -14,7 +14,7 @@ varying vec2 vUv;
 
 vec4 timeNoise(vec2 uv, float time) {
   // 避免时间增长导致噪声变化变小
-  time = (sin(time * .01)) * 10.; // -10 ~ 10
+  time = (sin(time * .01) * .5 + .5) * 5. + 5.; // 5 ~ 10
 
   vec2 uv0 = (uv / 103.0) + vec2(time / 17.0, time / 29.0);
   vec2 uv1 = uv / 107.0 - vec2(time / -19.0, time / 31.0);
@@ -28,11 +28,6 @@ vec4 timeNoise(vec2 uv, float time) {
                texture2D(normalSampler, uv3);
 
   return noise * 0.5 - 1.0;
-}
-
-// 简单的噪声函数
-float simpleNoise(vec2 uv) {
-  return fract(sin(dot(uv.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
 vec4 bilinearInterpolation(sampler2D t, vec2 uv, float texelSize) {
@@ -64,10 +59,6 @@ void main() {
 
   float d = length(worldToEye);
 
-  float t = 1.0 - clamp(0.0001 / distance(vUv, vec2(0.5)) - 0.5, 0.0, 1.0); // 角色倒影偏离矫正
-  vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / d) * distortionScale * t;
-  vec3 reflectionSample = vec3(texture2D(mirrorSampler, vMirrorCoord.xy / vMirrorCoord.w + distortion));
-
   float intensity = smoothstep(-.5, 1.2, uIntensity);
   // 浪花
   float spray = 1. - dot(surfaceNormal, vec3(0., 1., 0.));
@@ -89,10 +80,18 @@ void main() {
     wave = bilinearInterpolation(uWaveTexture, centeredUv, wCell).r;
 
     // 截取值范围
-    float minRange = 0.1;
+    float minRange = 0.125;
     float maxRange = 0.2;
     wave = clamp((wave - minRange) / (maxRange - minRange), 0.0, 1.0);
     wave = step(minRange, wave) * intensity;
+  }
+
+  // 倒影
+  vec3 reflectionSample = vec3(0.);
+  if (wave + spray <= 0.) {
+    float t = 1.0 - clamp(0.0001 / distance(vUv, vec2(0.5)) - 0.5, 0.0, 1.0); // 角色倒影偏离矫正
+    vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / d) * distortionScale * t;
+    reflectionSample = vec3(texture2D(mirrorSampler, vMirrorCoord.xy / vMirrorCoord.w + distortion));
   }
 
   vec3 color = reflectionSample + spray + wave;

@@ -5,9 +5,7 @@ import { MathUtils } from "three"
 
 const ACTIONS = {
   RUNNING: 'running',
-  SITTING: 'sitting',
   IDLE: 'idle',
-  STANDING_UP: 'standing up',
   SWIMMING: 'swimming',
   TREADING_WATER: 'treading water',
   WALKING: 'walking',

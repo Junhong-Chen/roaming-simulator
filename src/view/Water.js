@@ -224,7 +224,7 @@ export default class Water extends Mesh {
     const waveUniforms = this.gpgpu.waveVariable.material.uniforms
     waveUniforms.uPlayerUv.value.set(...waterSate.playerUv)
     // this.gpgpu.computation.compute()
-    
+
     const uniforms = this.material.uniforms
     uniforms.time.value = clock.elapsed
     uniforms.distortionScale.value = smoothstep(3, 10, playerState.camera.position[1]) * 0.5 + 0.175
