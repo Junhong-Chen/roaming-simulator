@@ -1,44 +1,37 @@
-export default class Music {
-  #audio
-  #analyser
-  #dataArray
+export const MUSIC = {
+  BGM: 'bgm'
+}
 
-  get analyser() {
-    if (this.#analyser) this.#analyser.getByteFrequencyData(this.#dataArray)
-    return this.#dataArray || []
-  }
+export default class Music {
+  static MUSIC
+
+  #audio = {}
+  #enabled = {}
 
   constructor() {
-    // this.init()
+    this.#audio[MUSIC.BGM] = new Audio('/sounds/ethereal.mp3')
+    this.#enabled[MUSIC.BGM] = false
   }
 
   init() {
-    const autoPlay = () => {
-      this.#audio = new Audio('/sounds/music.mp3')
-      this.#audio.setAttribute('loop', true)
-  
-      const audioCtx = new window.AudioContext()
-      this.#analyser = audioCtx.createAnalyser()
-      const source = audioCtx.createMediaElementSource(this.#audio)
-  
-      source.connect(this.#analyser)
-      this.#analyser.connect(audioCtx.destination)
-  
-      this.#analyser.fftSize = 32
-      this.#dataArray = new Uint8Array(this.#analyser.frequencyBinCount)
-      this.play()
-      window.removeEventListener('mousedown', autoPlay, false)
+    if (!this.#enabled[MUSIC.BGM]) {
+      this.#audio[MUSIC.BGM].volume = 0
+      this.#audio[MUSIC.BGM].play().then(() => {
+        this.#audio[MUSIC.BGM].pause()
+        this.#audio[MUSIC.BGM].currentTime = 0
+        this.#audio[MUSIC.BGM].volume = 1
+        this.#enabled[MUSIC.BGM] = true
+      })
     }
-    window.addEventListener('mousedown', autoPlay, false)
   }
 
-  play() {
-    this.#audio.play()
+  play(name) {
+    this.#audio[name].play()
   }
 
-  pause() {
-    this.#audio.pause()
+  pause(name) {
+    this.#audio[name].pause()
   }
 
-  switch() {}
+  switch() { }
 }

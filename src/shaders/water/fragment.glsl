@@ -60,11 +60,12 @@ void main() {
   float d = length(worldToEye);
 
   float intensity = smoothstep(-.5, 1.2, uIntensity);
+
   // 浪花
   float spray = 1. - dot(surfaceNormal, vec3(0., 1., 0.));
   spray = step(.1, spray) * intensity;
 
-  // 波纹
+  // 涟漪
   float scale = pow(1. / 8., 2.);
   vec2 minUv = vec2(0.5 - scale);
   vec2 maxUv = vec2(1.0 - minUv.x, 1.0 - minUv.y);
@@ -96,5 +97,5 @@ void main() {
 
   vec3 color = reflectionSample + spray + wave;
 
-  gl_FragColor = vec4(color, 1.0);
+  gl_FragColor = vec4(color, 0.8);
 }

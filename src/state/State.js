@@ -5,6 +5,7 @@ import Terrains from "./Terrains"
 import Controls from "./Controls"
 import Chunks from "./Chunks"
 import Water from "./Water"
+import Sounds from "./Sounds"
 
 
 export default class State {
@@ -21,6 +22,7 @@ export default class State {
     this.chunks = new Chunks(this)
     this.terrains = new Terrains(this)
     this.water = new Water(this)
+    this.sounds = new Sounds(this)
   }
 
   update() {
@@ -30,7 +32,10 @@ export default class State {
     this.player.update()
     this.chunks.update()
     this.water.update()
+    this.sounds.update()
   }
 
-  destroy() {}
+  destroy() {
+    this.sounds.destroy()
+  }
 }
