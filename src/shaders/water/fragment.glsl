@@ -12,7 +12,7 @@ varying vec4 vMirrorCoord;
 varying vec4 vWorldPosition;
 varying vec2 vUv;
 
-vec4 timeNoise(vec2 uv, float time) {
+vec4 normalNoise(vec2 uv, float time) {
   // 避免时间增长导致噪声变化变小
   time = (sin(time * .01) * .5 + .5) * 5. + 5.; // 5 ~ 10
 
@@ -52,7 +52,7 @@ vec4 bilinearInterpolation(sampler2D t, vec2 uv, float texelSize) {
 }
 
 void main() {
-  vec4 noise = timeNoise(vWorldPosition.xz * size, time);
+  vec4 noise = normalNoise(vWorldPosition.xz * size, time);
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
   vec3 worldToEye = eye - vMirrorCoord.xyz;
