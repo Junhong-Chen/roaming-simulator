@@ -1,12 +1,12 @@
-[Switch to English](#english-version) | [切换到中文](#中文版)
+[English](#roaming-simulator) | [中文](#漫游模拟器) 
 
-# Roaming Simulator | 漫游模拟器
+# 漫游模拟器
 
 **漫游模拟器** 是一款放松的探索游戏，玩家可以在各种自然景观中随意漫步，探索包括山川和湖泊等地形。游戏为玩家提供了一个宁静且沉浸式的环境，您可以悠闲地走动，享受美丽的风景。
 
 ---
 
-## Features | 特色
+## 特色
 
 - **动态地形**：探索多种地形，如山川、湖泊、沙地等。
 - **昼夜交替**：体验逼真的昼夜变化，随时间推移环境光影色彩会自然改变。
@@ -15,33 +15,33 @@
 
 ---
 
-## Gameplay | 游戏玩法
+## 游戏玩法
 
 在 **漫游模拟器** 中，没有任何目标、敌人或挑战。唯一的任务就是随心所欲地在不同的地形中漫步，享受周围的宁静。随着一天的流逝，环境的光线和色彩会从黎明到黄昏自然变化，而在夜晚的最深处，您可能会幸运地看到极光点亮夜空的奇妙景象。
 
 ---
 
-## Controls | 控制
+## 控制
 
 - **W/A/S/D 或方向键**：移动角色
 - **鼠标**：环顾四周
 
 ---
 
-## License | 许可证
+## 许可证
 
 该项目基于 MIT 许可证开源 - 详情请查看 [LICENSE](LICENSE) 文件。
 
 ---
 
-## Links | 链接
+## 链接
 
 - [在此游玩游戏](https://your-game-link.com)
 - [GitHub 仓库](https://github.com/your-username/roaming-simulator)
 
 ---
 
-# English Version
+# Roaming Simulator
 
 **Roaming Simulator** is a relaxing exploration game where players can freely wander through diverse natural landscapes, including mountains and lakes. The game offers a peaceful and immersive environment where you can simply walk around and enjoy the beautiful scenery.
 
