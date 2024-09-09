@@ -15,7 +15,8 @@ void main() {
   float left = texture(uWaveTexture, uv - vec2(s.x, 0.0)).r;
   float right = texture(uWaveTexture, uv + vec2(s.x, 0.0)).r;
 
-  float wave = ((up + down + left + right) * 0.5 - t.g) * 0.95;
+  float decay = 0.925;
+  float wave = ((up + down + left + right) * 0.5 - t.g) * decay;
 
   // 角色移动
   if((length(uPlayerUv - uv) < s.x) && t.ba != uPlayerUv) { // 玩家 uv 和纹理 uv 足够接近

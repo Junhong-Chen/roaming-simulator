@@ -123,10 +123,10 @@ void main() {
   // color = bg(rd) * fade; // 添加背景色
 
   float boundaryI = .25; // 光照强度小于 0.25 时生成极光
-  if(rd.y > 0. && uIntensity < boundaryI) { // 如果光线朝向天空 & 夜晚
+  if(rd.y > 0. && uIntensity < boundaryI) { // 如果光线朝向天空
     vec4 aur = smoothstep(0., 1.5, aurora(ro, rd)) * fade; // 生成极光
     // color += stars(rd); // 添加星星
-    color = aur.rgb * smoothstep(boundaryI, 0., uIntensity); // 混合极光和背景颜色
+    color = aur.rgb * smoothstep(boundaryI, 0., uIntensity); // 极光淡入与淡出
   }
 
   gl_FragColor = vec4(color, 1.);

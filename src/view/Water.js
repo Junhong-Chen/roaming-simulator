@@ -1,5 +1,4 @@
-import { LinearFilter, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, TextureLoader, Uniform, Vector2, Vector3, Vector4, WebGLRenderTarget } from "three"
-import { smoothstep } from "../utils/utils"
+import { Matrix4, Mesh, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, TextureLoader, Uniform, Vector2, Vector3, Vector4, WebGLRenderTarget } from "three"
 import { GPUComputationRenderer } from "three/examples/jsm/Addons.js"
 
 import WaterMaterial from "../materials/WaterMaterial"
@@ -227,7 +226,6 @@ export default class Water extends Mesh {
 
     const uniforms = this.material.uniforms
     uniforms.time.value = clock.elapsed
-    uniforms.distortionScale.value = smoothstep(3, 10, playerState.camera.position[1]) * 0.5 + 0.175
     uniforms.uIntensity.value = sunState.intensity
     uniforms.uWaveTexture.value = this.gpgpu.computation.getCurrentRenderTarget(this.gpgpu.waveVariable).texture
 

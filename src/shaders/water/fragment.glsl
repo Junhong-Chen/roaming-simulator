@@ -13,8 +13,6 @@ varying vec4 vWorldPosition;
 varying vec2 vUv;
 
 vec4 normalNoise(vec2 uv, float time) {
-  // 避免时间增长导致噪声变化变小
-  time = (sin(time * .01) * .5 + .5) * 5. + 5.; // 5 ~ 10
 
   vec2 uv0 = (uv / 103.0) + vec2(time / 17.0, time / 29.0);
   vec2 uv1 = uv / 107.0 - vec2(time / -19.0, time / 31.0);
@@ -52,7 +50,7 @@ vec4 bilinearInterpolation(sampler2D t, vec2 uv, float texelSize) {
 }
 
 void main() {
-  vec4 noise = normalNoise(vWorldPosition.xz * size, time);
+  vec4 noise = normalNoise(vWorldPosition.xz * size, time * .1);
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
   float intensity = smoothstep(-.5, 1.2, uIntensity);
@@ -78,20 +76,19 @@ void main() {
 
     // 截取值范围
     float minRange = 0.125;
-    float maxRange = 0.2;
+    float maxRange = 0.25;
     wave = clamp((wave - minRange) / (maxRange - minRange), 0.0, 1.0);
     wave = step(minRange, wave) * intensity;
   }
 
   // 倒影
-  vec3 worldToEye = eye - vMirrorCoord.xyz;
-
-  float d = length(worldToEye);
+  // vec3 worldToEye = eye - vMirrorCoord.xyz;
+  // float d = length(worldToEye);
 
   vec3 reflectionSample = vec3(0.);
   if (wave + spray <= 0.) {
     float t = 1.0 - clamp(0.0001 / distance(vUv, vec2(0.5)) - 0.5, 0.0, 1.0); // 角色倒影偏离矫正
-    vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / d) * distortionScale * t;
+    vec2 distortion = surfaceNormal.xz * distortionScale * t;
     reflectionSample = vec3(texture2D(mirrorSampler, vMirrorCoord.xy / vMirrorCoord.w + distortion));
   }
 

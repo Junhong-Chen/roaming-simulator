@@ -15,7 +15,7 @@ export default class WaterMaterial extends ShaderMaterial {
           alpha: new Uniform(0.75),
           time: new Uniform(0),
           size: new Uniform(1),
-          distortionScale: new Uniform(0.175), // 倒影失真系数
+          distortionScale: new Uniform(0.01), // 倒影失真系数
           textureMatrix: new Uniform(new Matrix4()),
           eye: new Uniform(new Vector3()),
           uIntensity: new Uniform(1),

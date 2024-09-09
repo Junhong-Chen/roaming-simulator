@@ -163,8 +163,6 @@ export class CameraFly {
         this.rotateX = this.rotateXLimits.max
     }
 
-    // console.log('this.rotateY', this.rotateY)
-
     // Rotation Matrix
     const rotationMatrix = mat4.create()
     mat4.rotateY(rotationMatrix, rotationMatrix, this.rotateY)

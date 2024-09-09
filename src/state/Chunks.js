@@ -253,7 +253,6 @@ export default class Chunks extends EventEmitter {
   // 获取最深层的子块
   getDeepestChunkForPosition(x, z) {
     const baseChunk = this.getChildChunkForPosition(x, z)
-    // console.log(!baseChunk)
     if (!baseChunk)
       return false
 
@@ -264,8 +263,6 @@ export default class Chunks extends EventEmitter {
   // 获取地形块的海拔信息
   getElevationForPosition(x, z) {
     const currentChunk = this.getDeepestChunkForPosition(x, z)
-
-    // console.log(currentChunk, currentChunk.terrain)
 
     if (!currentChunk || !currentChunk.terrain)
       return false

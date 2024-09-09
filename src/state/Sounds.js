@@ -26,7 +26,6 @@ export default class Sounds {
     })
 
     state.day.on('day', day => {
-      console.log(!day, this.enable)
       if (!day && this.enable) this.music.play(MUSIC.BGM)
     })
   }

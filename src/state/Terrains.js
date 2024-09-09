@@ -37,7 +37,6 @@ export default class Terrains extends EventEmitter {
     for (let i = 0; i < this.maxIterations; i++)
       this.iterationsOffsets.push([(this.random() - 0.5) * 200000, (this.random() - 0.5) * 200000])
 
-    // console.log('iterationsOffsets: ', this.iterationsOffsets)
     // 新开线程计算地形数据
     this.setWorkers()
   }
