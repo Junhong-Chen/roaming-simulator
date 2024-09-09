@@ -28,7 +28,7 @@ export default class Viewport extends EventEmitter {
 
   updateSize() {
     this.#width = window.innerWidth
-    this.#height = window.innerHeight
+    this.#height = Math.min(Math.ceil(window.innerWidth / 3), window.innerHeight)
     this.#pixelRatio = Math.min(window.devicePixelRatio, 2)
     this.smallestSide = this.width < this.height ? this.width : this.height
     this.biggestSide = this.width > this.height ? this.width : this.height

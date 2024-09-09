@@ -32,10 +32,6 @@ export default class App {
     this.loader.on('loaded', (resources) => {
       this.view.load(resources)
     })
-
-    window.addEventListener('click', () => {
-      this.music.init()
-    })
   }
 
   update = ({ deltaTime, elapsedTime }) => {

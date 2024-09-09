@@ -55,10 +55,6 @@ void main() {
   vec4 noise = normalNoise(vWorldPosition.xz * size, time);
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
-  vec3 worldToEye = eye - vMirrorCoord.xyz;
-
-  float d = length(worldToEye);
-
   float intensity = smoothstep(-.5, 1.2, uIntensity);
 
   // 浪花
@@ -76,7 +72,7 @@ void main() {
     // 将中心区域的 UV 映射到 [0, 1] 范围内
     vec2 centeredUv = (vUv - minUv) / (maxUv - minUv);
 
-    float wCell = 1. / 256.; // 波纹纹理的单个像素大小
+    float wCell = 1. / 256.; // 涟漪纹理单个像素的大小
 
     wave = bilinearInterpolation(uWaveTexture, centeredUv, wCell).r;
 
@@ -88,6 +84,10 @@ void main() {
   }
 
   // 倒影
+  vec3 worldToEye = eye - vMirrorCoord.xyz;
+
+  float d = length(worldToEye);
+
   vec3 reflectionSample = vec3(0.);
   if (wave + spray <= 0.) {
     float t = 1.0 - clamp(0.0001 / distance(vUv, vec2(0.5)) - 0.5, 0.0, 1.0); // 角色倒影偏离矫正
@@ -97,5 +97,5 @@ void main() {
 
   vec3 color = reflectionSample + spray + wave;
 
-  gl_FragColor = vec4(color, 0.8);
+  gl_FragColor = vec4(color, alpha);
 }

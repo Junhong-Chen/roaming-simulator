@@ -1,7 +1,7 @@
 {
-  "name": "three.js-template",
+  "name": "roaming-simulator",
   "version": "0.0.1",
-  "description": "three.js template",
+  "description": "Roaming Simulator",
   "main": "src/index.js",
   "type": "module",
   "scripts": {

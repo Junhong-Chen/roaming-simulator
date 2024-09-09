@@ -6,7 +6,7 @@ export default class Renderer extends WebGLRenderer {
 
     this.shadowMap.enabled = true
 
-    document.body.appendChild(this.domElement)
+    document.querySelector('#game').appendChild(this.domElement)
   }
 
   update(scene, camera) {

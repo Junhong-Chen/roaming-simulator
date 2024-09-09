@@ -22,7 +22,7 @@ export default class Water {
       vec2.set(this.playerUv, relative[0] * this.waveScale + 0.5, -relative[2] * this.waveScale + 0.5)
     }
 
-    if (speed === 0 && this.waveScale) { // 角色停下时，同步水面 mesh 位置
+    if ((speed === 0 && this.waveUpdate) || position[1] > 1) { // 角色停下 或 角色所处地形海拔于 1 时，同步水面 mesh 位置
       // 暂时不更新uv
       this.waveUpdate = false
 

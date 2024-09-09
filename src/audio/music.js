@@ -26,6 +26,7 @@ export default class Music {
   }
 
   play(name) {
+    this.#audio[name].currentTime = 0
     this.#audio[name].play()
   }
 
