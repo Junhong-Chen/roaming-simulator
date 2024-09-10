@@ -10,20 +10,68 @@ export default class Water extends Mesh {
     super(new PlaneGeometry(waterSize, waterSize))
     this.view = view
 
-    const renderTarget = this.createRendererTarget()
-
-    this.createWaveTexture()
-
-    const normalSampler = new TextureLoader().load('textures/waternormals.jpg', function (texture) {
-      texture.wrapS = texture.wrapT = RepeatWrapping
-    })
-
-    const material = this.material = new WaterMaterial({
+    this.material = new WaterMaterial({
       fog: view.scene.fog !== undefined
     })
 
-    material.uniforms.mirrorSampler.value = renderTarget.texture
-    material.uniforms.normalSampler.value = normalSampler
+    this.createRendererTarget()
+    
+    this.createWaveTexture()
+
+    this.setDebug()
+  }
+
+  load(files) {
+    const waterNormalTexture = files.get('water')[0].file
+    waterNormalTexture.wrapS = waterNormalTexture.wrapT = RepeatWrapping
+
+    this.createMirror(waterNormalTexture)
+  }
+
+  createRendererTarget() {
+    const { width, height } = this.view.viewport
+    this.renderTarget = new WebGLRenderTarget(width, height)
+    return this.renderTarget
+  }
+
+  createWaveTexture() {
+    const size = 512 // 纹理大小
+    const gpgpu = this.gpgpu = {
+      size
+    }
+    gpgpu.computation = new GPUComputationRenderer(size, size, this.view.renderer)
+
+    const texture = gpgpu.computation.createTexture()
+    const color = texture.image.data
+    for (let i = 0; i < size * size; i++) {
+      const k = i * 4
+      // texture 中每个像素包含 RBGA 四个值，RG 分别表示当前帧与前一帧的值， BA 表示当前玩家位置
+      color[k + 0] = 0
+      color[k + 1] = 0
+      color[k + 2] = 0
+      color[k + 3] = 0
+    }
+
+    // 将纹理注入到 shader 中
+    gpgpu.waveVariable = gpgpu.computation.addVariable('uWaveTexture', waveShader, texture)
+
+    const uniforms = gpgpu.waveVariable.material.uniforms
+    uniforms.uTime = new Uniform(0)
+    uniforms.uPlayerUv = new Uniform(new Vector2())
+
+    // 将变量自己作为依赖项，将现在的状态发送到下一次计算中，达到数据可持续化的效果
+    gpgpu.computation.setVariableDependencies(gpgpu.waveVariable, [gpgpu.waveVariable])
+    gpgpu.computation.init()
+
+    // 降低更新频率
+    this.timer = setInterval(() => {
+      this.gpgpu.computation.compute()
+    }, 66.66)
+  }
+
+  createMirror(normalSampler) {
+    this.material.uniforms.mirrorSampler.value = this.renderTarget.texture
+    this.material.uniforms.normalSampler.value = normalSampler
 
     const mirrorCamera = new PerspectiveCamera() // 镜像相机
     const mirrorPlane = new Plane() // 镜像屏幕
@@ -40,8 +88,8 @@ export default class Water extends Mesh {
     const target = new Vector3()
     const q = new Vector4()
 
-    const textureMatrix = material.uniforms.textureMatrix.value
-    const eye = material.uniforms.eye.value
+    const textureMatrix = this.material.uniforms.textureMatrix.value
+    const eye = this.material.uniforms.eye.value
 
     const scope = this
     this.onBeforeRender = function (renderer, scene, camera) {
@@ -135,7 +183,7 @@ export default class Water extends Mesh {
       renderer.xr.enabled = false // Avoid camera modification and recursion
       renderer.shadowMap.autoUpdate = false // Avoid re-computing shadows
 
-      renderer.setRenderTarget(renderTarget)
+      renderer.setRenderTarget(this.renderTarget)
 
       renderer.state.buffers.depth.setMask(true) // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
@@ -162,51 +210,7 @@ export default class Water extends Mesh {
     }
 
     this.geometry.rotateX(-Math.PI * 0.5)
-    view.scene.add(this)
-
-    this.setDebug()
-  }
-
-  createRendererTarget() {
-    const { width, height } = this.view.viewport
-    this.renderTarget = new WebGLRenderTarget(width, height)
-    return this.renderTarget
-  }
-
-  createWaveTexture() {
-    const size = 512 // 纹理大小
-    const gpgpu = this.gpgpu = {
-      size
-    }
-    gpgpu.computation = new GPUComputationRenderer(size, size, this.view.renderer)
-
-    const texture = gpgpu.computation.createTexture()
-    const color = texture.image.data
-    for (let i = 0; i < size * size; i++) {
-      const k = i * 4
-      // texture 中每个像素包含 RBGA 四个值，RG 分别表示当前帧与前一帧的值， BA 表示当前玩家位置
-      color[k + 0] = 0
-      color[k + 1] = 0
-      color[k + 2] = 0
-      color[k + 3] = 0
-    }
-
-    // 将纹理注入到 shader 中
-    gpgpu.waveVariable = gpgpu.computation.addVariable('uWaveTexture', waveShader, texture)
-
-    const uniforms = gpgpu.waveVariable.material.uniforms
-    uniforms.uTime = new Uniform(0)
-    uniforms.uPlayerUv = new Uniform(new Vector2())
-
-    // 将变量自己作为依赖项，将现在的状态发送到下一次计算中，达到数据可持续化的效果
-    gpgpu.computation.setVariableDependencies(gpgpu.waveVariable, [gpgpu.waveVariable])
-    gpgpu.computation.init()
-
-    // 降低更新频率
-    this.timer = setInterval(() => {
-      this.gpgpu.computation.compute()
-    }, 66.66)
-    
+    this.view.scene.add(this)
   }
 
   resize(width, height) {

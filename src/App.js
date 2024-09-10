@@ -29,7 +29,7 @@ export default class App {
 
     this.clock.on('tick', this.update)
 
-    this.loader.on('loaded', (resources) => {
+    this.loader.on('loaded', resources => {
       this.view.load(resources)
     })
   }

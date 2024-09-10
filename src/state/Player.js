@@ -33,6 +33,8 @@ export default class Player extends EventEmitter {
     this.camera = new Camera(state)
 
     this.actionTimeScale = 1
+
+    this.setDebug()
   }
 
   update() {
@@ -121,5 +123,20 @@ export default class Player extends EventEmitter {
       this.emit('actionTimeScale', { timeScale })
       this.actionTimeScale = timeScale
     }
+  }
+
+  setDebug() {
+    const debug = this.state.debug
+    if (!debug.gui)
+      return
+
+    const debugObj = {
+      position: () => {
+        console.log(this.position)
+      }
+    }
+
+    const waterFolder = debug.getFolder('state/player')
+    waterFolder.add(debugObj, 'position')
   }
 }

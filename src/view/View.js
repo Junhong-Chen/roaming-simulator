@@ -25,6 +25,8 @@ export default class View {
 
   load(resources) {
     this.player.load(resources)
+    this.sky.load(resources)
+    this.water.load(resources)
     this.light.playerLight.target = this.player.model
   }
 

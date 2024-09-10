@@ -8,9 +8,10 @@ export default class Day extends EventEmitter {
     this.autoUpdate = true
     this.timeProgress = 0
     this.progress = 0
-    this.duration = 120 // Seconds
+    this.duration = 215 // Seconds
 
-    this.isDay = true
+    this.auroraStamp = false
+    this.sunriseStamp = false
 
     this.setDebug()
   }
@@ -18,14 +19,22 @@ export default class Day extends EventEmitter {
   update() {
     if (this.autoUpdate) {
       this.timeProgress += this.state.clock.delta / this.duration
-      this.progress = this.timeProgress % 1 // 白天: 0.75 ~ 0.25，夜晚: 0.25 ~ 0.75
+      this.progress = this.timeProgress % 1 // 白天: 0 ~ 0.25 0.75 ~ 1; 夜晚: 0.25 ~ 0.75
 
-      if ((this.progress > 0.75 || this.progress < 0.25) && !this.isDay) {
-        this.isDay = true
-        this.emit('day', this.isDay)
-      } else if (this.progress > 0.25 && this.progress < 0.75 && this.isDay) {
-        this.isDay = false
-        this.emit('day', this.isDay)
+      // 日出
+      if (!this.sunriseStamp && (Math.abs(this.progress - 0.75) < 0.001)) {
+        this.sunriseStamp = true
+        this.emit('sunrise', this.sunriseStamp)
+      } else if (this.sunriseStamp && this.progress > 0.25 && this.progress < 0.75) {
+        this.sunriseStamp = false
+      }
+
+      // 深夜
+      if (!this.auroraStamp && (Math.abs(this.progress - 0.34) < 0.001)) {
+        this.auroraStamp = true
+        this.emit('aurora', this.auroraStamp)
+      } else if (this.auroraStamp && this.progress > 0.75) {
+        this.auroraStamp = false
       }
     }
   }

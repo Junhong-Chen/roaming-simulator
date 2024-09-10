@@ -1,4 +1,4 @@
-import { TextureLoader } from "three"
+import { AudioLoader, TextureLoader } from "three"
 import { GLTFLoader } from "three/examples/jsm/Addons.js"
 // import { DRACOLoader } from "three/examples/jsm/Addons.js"
 import EventEmitter from "./EventEmitter"
@@ -27,6 +27,7 @@ export default class Loader extends EventEmitter {
     // this.#loaders.gltf.setDRACOLoader(dLoader)
     this.#loaders.gltf = new GLTFLoader(loading.manager)
     this.#loaders.texture = new TextureLoader(loading.manager)
+    this.#loaders.audio = new AudioLoader(loading.manager)
   }
 
   load(sources) {

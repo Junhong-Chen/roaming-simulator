@@ -1,37 +1,44 @@
 export const MUSIC = {
-  BGM: 'bgm'
+  SUNRISE: 'sunrise',
+  AURORA: 'aurora',
+}
+
+export const SOUNDS = {
+  GRASS_WALK1: 'grass_walk1'
 }
 
 export default class Music {
-  static MUSIC
-
-  #audio = {}
-  #enabled = {}
+  #audios = {}
 
   constructor() {
-    this.#audio[MUSIC.BGM] = new Audio('/sounds/ethereal.mp3')
-    this.#enabled[MUSIC.BGM] = false
+    Object.values(MUSIC).forEach(name => {
+      this.#audios[name] = new Audio(`/sounds/${name}.mp3`)
+    })
+
+    Object.values(SOUNDS).forEach(name => {
+      this.#audios[name] = new Audio(`/sounds/grass/${name}.ogg`)
+    })
   }
 
   init() {
-    if (!this.#enabled[MUSIC.BGM]) {
-      this.#audio[MUSIC.BGM].volume = 0
-      this.#audio[MUSIC.BGM].play().then(() => {
-        this.#audio[MUSIC.BGM].pause()
-        this.#audio[MUSIC.BGM].currentTime = 0
-        this.#audio[MUSIC.BGM].volume = 1
-        this.#enabled[MUSIC.BGM] = true
+    Object.values(this.#audios).forEach(audio => {
+      audio.volume = 0
+      audio.play().then(() => {
+        audio.pause()
+        audio.currentTime = 0
+        audio.volume = 1
       })
-    }
+    })
+
   }
 
   play(name) {
-    this.#audio[name].currentTime = 0
-    this.#audio[name].play()
+    this.#audios[name].currentTime = 0
+    this.#audios[name].play()
   }
 
   pause(name) {
-    this.#audio[name].pause()
+    this.#audios[name].pause()
   }
 
   switch() { }

@@ -18,21 +18,33 @@ export default class Sounds {
       this.enable = !this.enable
 
       if (!this.enable) {
-        this.music.pause(MUSIC.BGM)
+        this.music.pause(MUSIC.AURORA)
+        this.music.pause(MUSIC.SUNRISE)
         musicEl.classList.add('disabled')
       } else {
         musicEl.classList.remove('disabled')
       }
     })
 
-    state.day.on('day', day => {
-      if (!day && this.enable) this.music.play(MUSIC.BGM)
+    state.day.on('sunrise', stamp => {
+      if (stamp && this.enable) {
+        this.music.pause(MUSIC.AURORA)
+        this.music.play(MUSIC.SUNRISE)
+      }
+    })
+
+    state.day.on('aurora', stamp => {
+      if (stamp && this.enable) {
+        this.music.pause(MUSIC.SUNRISE)
+        this.music.play(MUSIC.AURORA)
+      }
     })
   }
 
   update() {}
 
   destroy() {
-    this.off('day')
+    this.off('sunrise')
+    this.off('aurora')
   }
 }

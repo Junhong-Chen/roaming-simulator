@@ -86,4 +86,6 @@ export default class Player {
   destroy() {
     this.state.player.off('action')
   }
+
+  setDebug() {}
 }

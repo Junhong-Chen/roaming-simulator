@@ -1,6 +1,5 @@
 precision highp float;
 
-// Uniform 变量，需要从主程序中传递
 uniform vec2 uResolution;
 uniform float uTime;
 uniform float uIntensity;
@@ -88,7 +87,7 @@ vec3 nmzHash33(vec3 q) {
   return vec3(p ^ (p >> 16U)) * (1.0 / vec3(0xffffffffU));
 }
 
-// 星星背景生成函数
+// 星星生成函数
 vec3 stars(in vec3 p) {
   vec3 c = vec3(0.); // 初始化颜色
   float res = uResolution.x * 1.; // 获取分辨率

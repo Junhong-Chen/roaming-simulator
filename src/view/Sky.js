@@ -21,6 +21,12 @@ export default class Sky {
     this.setDebug()
   }
 
+  load(files) {
+    const lensflareTexture = files.get('sky')[0].file
+
+    this.setLensflare(lensflareTexture)
+  }
+
   setBackground() {
     this.background = {}
     this.background.mesh = new Mesh(
@@ -55,8 +61,10 @@ export default class Sky {
     this.sun.mesh = new Mesh(geometry, material)
     this.group.add(this.sun.mesh)
 
+  }
+
+  setLensflare (textureFlare) {
     // 光晕
-    const textureFlare = new TextureLoader().load('/textures/lensflare.png')
     const lensflare = new Lensflare()
     lensflare.addElement(new LensflareElement(textureFlare, 20, 0.75, new Color(0x33ff33)))
     lensflare.addElement(new LensflareElement(textureFlare, 100, 0.8), new Color(0xffff00))
