@@ -32,9 +32,12 @@ export default class App {
     this.clock.on('tick', this.update)
 
     this.loader.on('loaded', resources => {
-      this.audios.load(resources)
       this.state.load(resources)
       this.view.load(resources)
+      
+      this.ui.on('start', () => {
+        this.audios.load(resources)
+      })
     })
   }
 

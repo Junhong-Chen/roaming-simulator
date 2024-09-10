@@ -45,11 +45,11 @@ export default class Loader extends EventEmitter {
     if (!this.#files.has(name)) {
       this.#files.set(name, [])
     }
+
     this.#files.get(name).push({
       type,
       file
     })
-
 
     this.#loadedTotal++
     if (this.#loadTotal === this.#loadedTotal) {

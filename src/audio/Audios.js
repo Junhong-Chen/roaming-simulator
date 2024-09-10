@@ -12,11 +12,10 @@ export const SOUNDS = {
 export default class Audios {
   #audios = {}
 
-  constructor() {
-    this.listener = new AudioListener() // 控制音频及音频空间化的核心组件
-  }
-
+  constructor() {}
+  
   load(files) {
+    this.listener = new AudioListener() // 控制音频及音频空间化的核心组件
     files.get('bgm').forEach(({ file: audioBuffer  }) => {
       this.#audios[audioBuffer.name] = new Audio(this.listener)
       this.#audios[audioBuffer.name].setBuffer(audioBuffer)

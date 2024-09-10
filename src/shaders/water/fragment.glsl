@@ -1,3 +1,5 @@
+precision highp float;
+
 uniform sampler2D mirrorSampler;
 uniform float alpha;
 uniform float time;
@@ -9,6 +11,7 @@ uniform float uIntensity;
 uniform sampler2D uWaveTexture;
 uniform float uWaveSize;
 uniform float uWaveScale;
+uniform vec2 uWaveOffset;
 
 varying vec4 vMirrorCoord;
 varying vec4 vWorldPosition;
@@ -69,7 +72,7 @@ void main() {
   // 判断当前 UV 是否在中心区域内
   if (spray <= 0. && vUv.x > minUv.x && vUv.x < maxUv.x && vUv.y > minUv.y && vUv.y < maxUv.y) {
     // 将中心区域的 UV 映射到 [0, 1] 范围内
-    vec2 centeredUv = (vUv - minUv) / (maxUv - minUv);
+    vec2 centeredUv = (vUv - minUv - uWaveScale * uWaveOffset) / (maxUv - minUv);
 
     float wCell = 1. / uWaveSize; // 涟漪纹理单个像素的大小
 

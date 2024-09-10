@@ -1,4 +1,4 @@
-import { Color, FrontSide, Matrix4, ShaderMaterial, Uniform, UniformsLib, UniformsUtils, Vector3 } from "three"
+import { FrontSide, Matrix4, ShaderMaterial, Uniform, UniformsLib, UniformsUtils, Vector2, Vector3 } from "three"
 
 import vertexShader from "../shaders/water/vertex.glsl"
 import fragmentShader from "../shaders/water/fragment.glsl"
@@ -21,7 +21,8 @@ export default class WaterMaterial extends ShaderMaterial {
           uIntensity: new Uniform(1),
           uWaveTexture: new Uniform(null),
           uWaveSize: new Uniform(1),
-          uWaveScale: new Uniform(1)
+          uWaveScale: new Uniform(1),
+          uWaveOffset: new Uniform(new Vector2())
         }
       ]),
       vertexShader,

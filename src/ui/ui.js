@@ -1,10 +1,15 @@
-export default class UI {
+import EventEmitter from "../core/EventEmitter"
+
+export default class UI extends EventEmitter {
   constructor() {
+    super()
+
     this.setCursor()
 
     const uiEl = document.querySelector('#ui')
     const entryEl = uiEl.querySelector('#entry')
-    const entry = function() {
+    const entry = () => {
+      this.emit('start')
       uiEl.classList.add('hide')
       entryEl.removeEventListener('click', entry, false)
 
