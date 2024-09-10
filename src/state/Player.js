@@ -1,7 +1,7 @@
 import { vec3 } from "gl-matrix"
 import EventEmitter from "../core/EventEmitter.js"
 import Camera from "./Camera.js"
-import { MathUtils } from "three"
+import { AnimationMixer, MathUtils } from "three"
 
 const ACTIONS = {
   RUNNING: 'running',
@@ -27,24 +27,59 @@ export default class Player extends EventEmitter {
     this.positionPrevious = vec3.clone(this.position)
     this.positionDelta = vec3.create()
 
-    this.action = ACTIONS.IDLE
-    this.beforeAction = this.action
+    this.mixer = null
+    this.actions = {}
+
+    this.action = ACTIONS.IDLE // 当前动作
+    this.beforeAction = this.action // 前一个动作
 
     this.camera = new Camera(state)
-
-    this.actionTimeScale = 1
 
     this.setDebug()
   }
 
-  update() {
+  load(files) {
+    const modelFile = files.get('player')[0].file
+
+    const { scene: model, animations } = modelFile
+
+    this.mixer = new AnimationMixer(model)
+
+    if (animations) this.initActions(animations)
+  }
+
+  initActions(actions) {
+    for (let i = 0; i < actions.length; i++) {
+      const clip = actions[i]
+      const name = clip.name || i
+      const action = this.actions[name] = this.mixer.clipAction(clip)
+      this.setActionWeight(action, 0)
+      action.play()
+    }
+
+    this.setActionWeight(this.actions[this.action], 1)
+  }
+
+  setActionWeight(action, weight) {
+    action.enabled = true
+    action.setEffectiveTimeScale(1)
+    action.setEffectiveWeight(weight)
+  }
+
+  changeAction(before, current, duration = 0.5) {
+    current.time = 0
+    this.setActionWeight(current, 1)
+    before.crossFadeTo(current, duration, true)
+  }
+
+
+  update(deltaTime) {
     const controls = this.state.controls
     this.beforeAction = this.action
     const cameraFly = this.camera.mode === Camera.MODE_FLY
     const chunks = this.state.chunks
     const elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
     let swimming = false
-    let timeScale = 1
 
     // Update elevation
     if (elevation && elevation > -1 - 0.01) // EPSILON
@@ -111,18 +146,31 @@ export default class Player extends EventEmitter {
     // Update view
     this.camera.update()
 
-    // 更新角色动作
-    if (this.beforeAction !== this.action)
-      this.emit('action', { before: this.beforeAction, current: this.action })
+    if (this.mixer) {
+      this.mixer.update(deltaTime)
 
-    // 更新动作速度
-    if (swimming) {
-      timeScale = boost ? 1.5 : 1
+      // 更新角色动作
+      if (this.beforeAction !== this.action) {
+        this.changeAction(this.actions[this.beforeAction], this.actions[this.action])
+      }
+
+      // // 更新动作速度
+      if (swimming) {
+        this.mixer.timeScale = boost ? 1.5 : 1
+      }
+
+
+      // // 根据动画帧触发音效
+      // if (this.speed) {
+      //   const time = this.actions[this.action].time
+      //   console.log(time)
+
+      //   if (Math.abs(time - 0.38) < 0.02 || Math.abs(time - 0.78) < 0.02) {
+
+      //   }
+      // }
     }
-    if (timeScale !== this.actionTimeScale) {
-      this.emit('actionTimeScale', { timeScale })
-      this.actionTimeScale = timeScale
-    }
+
   }
 
   setDebug() {

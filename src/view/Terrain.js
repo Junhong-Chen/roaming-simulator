@@ -73,7 +73,7 @@ export default class Terrain {
 
   update() { }
 
-  destroy() {
+  destroy() { // 距离玩家角色位置较远时销毁
     if (this.created) {
       this.geometry.dispose()
       this.view.scene.remove(this.mesh)

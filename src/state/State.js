@@ -25,11 +25,15 @@ export default class State {
     this.sounds = new Sounds(this)
   }
 
-  update() {
+  load(resources) {
+    this.player.load(resources)
+  }
+
+  update(deltaTime, elapsedTime) {
     this.controls.update()
     this.day.update()
     this.sun.update()
-    this.player.update()
+    this.player.update(deltaTime)
     this.chunks.update()
     this.water.update()
     this.sounds.update()

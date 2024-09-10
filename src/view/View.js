@@ -36,7 +36,7 @@ export default class View {
     this.sky.update()
     this.terrains.update()
     this.water.update()
-    this.player.update(deltaTime)
+    this.player.update()
   }
 
   resize(width, height) {
@@ -57,5 +57,8 @@ export default class View {
         }
       }
     })
+
+    this.water.destroy()
+    this.player.destroy()
   }
 }

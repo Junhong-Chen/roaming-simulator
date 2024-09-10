@@ -206,7 +206,6 @@ export default class Water extends Mesh {
         renderer.state.viewport(viewport)
 
       }
-
     }
 
     this.geometry.rotateX(-Math.PI * 0.5)

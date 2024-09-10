@@ -1,6 +1,6 @@
 import { Scene } from "three"
 import sources from "./sources"
-import Music from "./audio/music"
+import Audios from "./audio/Audios"
 import Debugger from "./utils/Debugger"
 import Viewport from "./core/Viewport"
 import Clock from "./core/Clock"
@@ -14,7 +14,7 @@ export default class App {
 
   init() {
     this.debug = new Debugger()
-    this.music = new Music()
+    this.audios = new Audios()
     this.scene = new Scene()
     this.viewport = new Viewport()
     this.clock = new Clock()
@@ -30,6 +30,8 @@ export default class App {
     this.clock.on('tick', this.update)
 
     this.loader.on('loaded', resources => {
+      this.audios.load(resources)
+      this.state.load(resources)
       this.view.load(resources)
     })
   }

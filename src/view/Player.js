@@ -11,7 +11,7 @@ export default class Player {
   load(files) {
     const modelFile = files.get('player')[0].file
 
-    const { scene: model, animations } = modelFile
+    const { scene: model } = modelFile
 
     if (model) {
       this.model = model
@@ -22,31 +22,8 @@ export default class Player {
         }
       })
       this.group.add(model)
+
     }
-
-    this.mixer = new AnimationMixer(model)
-    if (animations) this.initActions(animations)
-  }
-
-  initActions(actions) {
-    this.actions = {}
-    for (let i = 0; i < actions.length; i++) {
-      const clip = actions[i]
-      const name = clip.name || i
-      const action = this.actions[name] = this.mixer.clipAction(clip)
-      this.setActionWeight(action, 0)
-      action.play()
-    }
-    // this.setActionWeight(this.actions[this.state.player.action], 1)
-    this.setActionWeight(this.actions[this.state.player.action], 1)
-
-    this.state.player.on('action', ({ before, current }) => {
-      this.changeAction(this.actions[before], this.actions[current])
-    })
-
-    this.state.player.on('actionTimeScale', ({ timeScale }) => {
-      this.mixer.timeScale = timeScale
-    })
   }
 
   setActionWeight(action, weight) {
@@ -61,9 +38,7 @@ export default class Player {
     before.crossFadeTo(current, duration, true)
   }
 
-  update(deltaTime) {
-    if (this.mixer) this.mixer.update(deltaTime)
-
+  update() {
     const { position, rotation } = this.state.player
     this.group.position.set(...position)
 
