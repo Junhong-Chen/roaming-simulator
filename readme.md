@@ -1,4 +1,4 @@
-[English](readme) | [中文](readme-zh) 
+[English](readme.md) | [中文](readme-zh.md)
 
 # Roaming Simulator
 
