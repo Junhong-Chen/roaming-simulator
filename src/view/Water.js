@@ -6,13 +6,14 @@ import waveShader from "../shaders/water/wave.glsl"
 
 export default class Water extends Mesh {
   constructor(view) {
-    const waterSize = view.state.water.size.water
-    super(new PlaneGeometry(waterSize, waterSize))
+    const { waveScale, size } = view.state.water
+    super(new PlaneGeometry(size.water, size.water))
     this.view = view
 
     this.material = new WaterMaterial({
       fog: view.scene.fog !== undefined
     })
+    this.material.uniforms.uWaveScale.value = waveScale
 
     this.createRendererTarget()
     
@@ -36,6 +37,7 @@ export default class Water extends Mesh {
 
   createWaveTexture() {
     const size = 512 // 纹理大小
+    this.material.uniforms.uWaveSize.value = size
     const gpgpu = this.gpgpu = {
       size
     }

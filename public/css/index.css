@@ -1,3 +1,12 @@
+:root {
+  --color-font: hsl(0, 0%, 80%);
+  --color-bg: #cba;
+  
+  --color-linear-0: #432;
+  --color-linear-1: #654;
+  --color-linear-2: #432;
+}
+
 html, body {
   padding: 0;
   margin: 0;
@@ -8,7 +17,7 @@ body {
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: black;
+  background: var(--color-bg);
   cursor: grab;
 }
 
@@ -16,25 +25,87 @@ body {
   cursor: grabbing;
 }
 
+.hide {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#ui {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  cursor: auto;
+  opacity: 1;
+  transition: opacity .5s;
+  will-change: opacity;
+}
+
 #game {
   position: relative;
 }
 
-#loading-bar {
+#entry {
   position: absolute;
-  top: calc(50% - 1px);
-  width: 100%;
-  height: 2px;
-  background-color: white;
-  transform: scale(0);
-  transform-origin: center left;
-  transition: transform 0.5s;
-  will-change: transform; /* 渲染性能优化 */
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 10px;
+  padding: 4px;
+  transform: translate(-50%, -50%);
+  border: 4px solid transparent;
+  border-radius: 6px;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image: linear-gradient(to right, var(--color-bg), var(--color-bg)), 
+                    linear-gradient(135deg, var(--color-linear-0), var(--color-linear-1), var(--color-linear-2));
+  transition: all 1s;
+  user-select: none;
+  cursor: pointer;
+  pointer-events: none;
 }
 
-#loading-bar.ended {
-  transform-origin: center right;
-  transition: transform 1.5s ease-in-out;
+#entry.ready {
+  width: 15%;
+  height: 3vw;
+  pointer-events: all;
+}
+
+#entry.ready > #bar {
+  opacity: 0;
+}
+
+#entry.ready > #tips {
+  opacity: 1;
+}
+
+#bar {
+  position: relative;
+  width: 0%;
+  height: 100%;
+  background-image: linear-gradient(to right, transparent 8px, var(--color-bg) 4px),
+                    linear-gradient(135deg, var(--color-linear-0), var(--color-linear-1), var(--color-linear-2));
+  background-size: 12px auto, 100% auto;
+  background-origin: content-box;
+  transition: all 0.5s;
+}
+
+#tips {
+  opacity: 0;
+  position: absolute;
+  text-align: center;
+  color: var(--color-font);
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  transition: opacity .5s;
+  transform: translate(calc(-50% + 1ch), -50%);
+  font-size: 1.5vw;
+  letter-spacing: 2ch;
+  background-image: linear-gradient(135deg, var(--color-linear-0), var(--color-linear-1), var(--color-linear-2));
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
 }
 
 #music {
@@ -48,9 +119,10 @@ body {
   border: 2px solid;
   border-radius: 50%;
   background-clip: content-box;
-  background: url("/images/music.png") center / 75% no-repeat;
+  background: url("roaming-simulator/images/music.png") center / 75% no-repeat;
   transform-origin: cneter;
   animation: 8s linear infinite rotate;
+  cursor: pointer;
 }
 
 #music.disabled {

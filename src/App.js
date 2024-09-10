@@ -1,5 +1,6 @@
 import { Scene } from "three"
 import sources from "./sources"
+import UI from "./ui/ui"
 import Audios from "./audio/Audios"
 import Debugger from "./utils/Debugger"
 import Viewport from "./core/Viewport"
@@ -15,6 +16,7 @@ export default class App {
   init() {
     this.debug = new Debugger()
     this.audios = new Audios()
+    this.ui = new UI()
     this.scene = new Scene()
     this.viewport = new Viewport()
     this.clock = new Clock()
@@ -52,6 +54,7 @@ export default class App {
     // e.preventDefault()
     this.viewport.off('resize')
     this.clock.off('tick')
+    this.ui.destroy()
     this.debug.destroy()
     this.viewport.destroy()
     this.clock.destroy()

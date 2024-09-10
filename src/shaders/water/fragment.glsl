@@ -7,6 +7,8 @@ uniform sampler2D normalSampler;
 uniform vec3 eye;
 uniform float uIntensity;
 uniform sampler2D uWaveTexture;
+uniform float uWaveSize;
+uniform float uWaveScale;
 
 varying vec4 vMirrorCoord;
 varying vec4 vWorldPosition;
@@ -60,8 +62,7 @@ void main() {
   spray = step(.1, spray) * intensity;
 
   // 涟漪
-  float scale = pow(1. / 8., 2.);
-  vec2 minUv = vec2(0.5 - scale);
+  vec2 minUv = vec2(0.5 - uWaveScale);
   vec2 maxUv = vec2(1.0 - minUv.x, 1.0 - minUv.y);
   float wave;
 
@@ -70,7 +71,7 @@ void main() {
     // 将中心区域的 UV 映射到 [0, 1] 范围内
     vec2 centeredUv = (vUv - minUv) / (maxUv - minUv);
 
-    float wCell = 1. / 256.; // 涟漪纹理单个像素的大小
+    float wCell = 1. / uWaveSize; // 涟漪纹理单个像素的大小
 
     wave = bilinearInterpolation(uWaveTexture, centeredUv, wCell).r;
 
@@ -82,9 +83,6 @@ void main() {
   }
 
   // 倒影
-  // vec3 worldToEye = eye - vMirrorCoord.xyz;
-  // float d = length(worldToEye);
-
   vec3 reflectionSample = vec3(0.);
   if (wave + spray <= 0.) {
     float t = 1.0 - clamp(0.0001 / distance(vUv, vec2(0.5)) - 0.5, 0.0, 1.0); // 角色倒影偏离矫正

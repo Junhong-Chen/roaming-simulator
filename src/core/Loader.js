@@ -2,7 +2,7 @@ import { AudioLoader, TextureLoader } from "three"
 import { GLTFLoader } from "three/examples/jsm/Addons.js"
 // import { DRACOLoader } from "three/examples/jsm/Addons.js"
 import EventEmitter from "./EventEmitter"
-import Loading from "../utils/Loading"
+import Loading from "./Loading"
 
 export default class Loader extends EventEmitter {
   #loaders = {}
@@ -33,7 +33,7 @@ export default class Loader extends EventEmitter {
   load(sources) {
     for (const { name, type, paths } of sources) {
       for (const path of paths) {
-        this.#loaders[type].load(path, (file) => {
+        this.#loaders[type].load(`${import.meta.env.VITE_BASE_PATH}/${path}`, (file) => {
           file.name = file.name || path.match(/\/(\S+)\./).pop()
           this.loaded({ name, type, file })
         })
