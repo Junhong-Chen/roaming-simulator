@@ -5,6 +5,7 @@ const dirname = path.resolve()
 
 /** @type {import('vite').UserConfig} */
 export default {
+  base: process.env.npm_package_name,
   resolve:
   {
     alias:
