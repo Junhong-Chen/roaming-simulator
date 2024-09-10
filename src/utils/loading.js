@@ -32,6 +32,7 @@ export default class Loading {
         })
       },
       (_, loaded, total) => { // onProgress
+        console.log(loaded/total)
         loadingBar.style.transform = `scale(${loaded / total})`
       }
     )

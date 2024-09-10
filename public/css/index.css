@@ -9,6 +9,11 @@ body {
   width: 100vw;
   height: 100vh;
   background: black;
+  cursor: grab;
+}
+
+.grabbing {
+  cursor: grabbing;
 }
 
 #game {

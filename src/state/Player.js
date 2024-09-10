@@ -4,11 +4,17 @@ import Camera from "./Camera.js"
 import { AnimationMixer, MathUtils } from "three"
 
 const ACTIONS = {
-  RUNNING: 'running',
   IDLE: 'idle',
-  SWIMMING: 'swimming',
-  TREADING_WATER: 'treading water',
-  WALKING: 'walking',
+  IDLE_WATER: 'idle_water',
+  WALK: 'walk',
+  RUN: 'run',
+  SWIM: 'swim',
+}
+
+const ACTIONS_STEP_TIME = {
+  [ACTIONS.WALK]: [0.38, 0.8],
+  [ACTIONS.RUN]: [0.36, 0.73],
+  [ACTIONS.SWIM]: [0.5, 2.7],
 }
 
 export default class Player extends EventEmitter {
@@ -32,6 +38,8 @@ export default class Player extends EventEmitter {
 
     this.action = ACTIONS.IDLE // 当前动作
     this.beforeAction = this.action // 前一个动作
+
+    this.soundPlaying = false
 
     this.camera = new Camera(state)
 
@@ -79,14 +87,14 @@ export default class Player extends EventEmitter {
     const cameraFly = this.camera.mode === Camera.MODE_FLY
     const chunks = this.state.chunks
     const elevation = chunks.getElevationForPosition(this.position[0], this.position[2])
-    let swimming = false
+    let swim = false
 
     // Update elevation
     if (elevation && elevation > -1 - 0.01) // EPSILON
       this.position[1] = elevation
     else {
       this.position[1] = -1
-      swimming = true
+      swim = true
     }
 
     // Moving
@@ -99,19 +107,16 @@ export default class Player extends EventEmitter {
           this.rotation += Math.PI * 0.25
         else if (controls.keys.down.strafeRight)
           this.rotation -= Math.PI * 0.25
-      }
-      else if (controls.keys.down.backward) {
+      } else if (controls.keys.down.backward) {
         if (controls.keys.down.strafeLeft)
           this.rotation += Math.PI * 0.75
         else if (controls.keys.down.strafeRight)
           this.rotation -= Math.PI * 0.75
         else
           this.rotation += Math.PI
-      }
-      else if (controls.keys.down.strafeLeft) {
+      } else if (controls.keys.down.strafeLeft) {
         this.rotation += Math.PI * 0.5
-      }
-      else if (controls.keys.down.strafeRight) {
+      } else if (controls.keys.down.strafeRight) {
         this.rotation -= Math.PI * 0.5
       }
 
@@ -128,13 +133,13 @@ export default class Player extends EventEmitter {
       this.position[2] -= z
 
       // 角色动作
-      if (swimming) {
-        this.action = ACTIONS.SWIMMING
+      if (swim) {
+        this.action = ACTIONS.SWIM
       } else {
-        this.action = boost ? ACTIONS.RUNNING : ACTIONS.WALKING
+        this.action = boost ? ACTIONS.RUN : ACTIONS.WALK
       }
     } else {
-      this.action = swimming ? ACTIONS.TREADING_WATER : ACTIONS.IDLE
+      this.action = swim ? ACTIONS.IDLE_WATER : ACTIONS.IDLE
       this.speed = 0
     }
 
@@ -143,34 +148,54 @@ export default class Player extends EventEmitter {
     // 计算实时速度（暂时用不上）
     // this.realSpeed = vec3.len(this.positionDelta)
 
-    // Update view
-    this.camera.update()
-
     if (this.mixer) {
       this.mixer.update(deltaTime)
+      const aciton = this.actions[this.action]
 
       // 更新角色动作
       if (this.beforeAction !== this.action) {
-        this.changeAction(this.actions[this.beforeAction], this.actions[this.action])
+        this.changeAction(this.actions[this.beforeAction], aciton)
       }
 
-      // // 更新动作速度
-      if (swimming) {
-        this.mixer.timeScale = boost ? 1.5 : 1
+      // 更新动作速度
+      this.mixer.timeScale = swim && boost ? 1.5 : 1
+
+      // 根据动画帧触发音效
+      if (this.speed) {
+        const time = aciton.time
+
+        this.stepSoundPlay(time, this.action)
       }
-
-
-      // // 根据动画帧触发音效
-      // if (this.speed) {
-      //   const time = this.actions[this.action].time
-      //   console.log(time)
-
-      //   if (Math.abs(time - 0.38) < 0.02 || Math.abs(time - 0.78) < 0.02) {
-
-      //   }
-      // }
     }
 
+    // Update view
+    this.camera.update()
+
+  }
+
+  stepSoundPlay(time, action) {
+    if (!this.soundPlaying) {
+
+      let terrain = 'grass'
+      if (this.position[1] < 0.75) {
+        terrain = 'sand'
+
+        if (this.position[1] <= 0) {
+          terrain = 'water'
+        }
+      }
+
+      ACTIONS_STEP_TIME[action].forEach(t => {
+        if (Math.abs(time - t) < 0.1) {
+          this.soundPlaying = true
+
+          if (terrain === 'water' && action === ACTIONS.RUN) action = ACTIONS.WALK // 水面没有 run 音源，统一用 walk 音源
+          this.emit('moving', { terrain, action: action })
+          setTimeout(() => this.soundPlaying = false, 200)
+        }
+      })
+
+    }
   }
 
   setDebug() {

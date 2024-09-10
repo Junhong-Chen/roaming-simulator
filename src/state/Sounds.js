@@ -1,9 +1,14 @@
 import { MUSIC } from "../audio/Audios"
+import sources from "../sources"
 
 export default class Sounds {
   constructor(state) {
     this.audios = state.app.audios
     this.enable = false
+
+    this.counts = {}
+    this.setSoundsCount()
+
     const musicEl = document.querySelector('#music')
 
     musicEl.addEventListener('click', (e) => {
@@ -31,6 +36,32 @@ export default class Sounds {
         this.audios.play(MUSIC.AURORA)
       }
     })
+
+    state.player.on('moving', ({ terrain, action }) => {
+      this.audios.play(`${terrain}/${action}/${this.getSoundRamdom(terrain, action)}`)
+    })
+  }
+
+  setSoundsCount() {
+    const sounds = sources.find(i => i.name === 'sounds')
+
+    if (sounds) {
+      sounds.paths.forEach(path => {
+        const [_, terrain, action] = path.split('/')
+        const name = `${terrain}_${action}`
+
+        if (this.counts[name] === undefined) {
+          this.counts[name] = 0
+        } else {
+          this.counts[name]++
+        }
+
+      })
+    }
+  }
+
+  getSoundRamdom(terrain, action) {
+    return Math.ceil(Math.random() * this.counts[`${terrain}_${action}`])
   }
 
   update() {}
