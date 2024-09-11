@@ -1,6 +1,6 @@
 import { Scene } from "three"
 import sources from "./sources"
-import UI from "./ui/ui"
+import UI from "./ui/UI"
 import Audios from "./audio/Audios"
 import Debugger from "./utils/Debugger"
 import Viewport from "./core/Viewport"
