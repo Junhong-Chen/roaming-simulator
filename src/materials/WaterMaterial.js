@@ -22,7 +22,6 @@ export default class WaterMaterial extends ShaderMaterial {
           uWaveTexture: new Uniform(null),
           uWaveSize: new Uniform(1),
           uWaveScale: new Uniform(1),
-          uWaveOffset: new Uniform(new Vector2())
         }
       ]),
       vertexShader,

@@ -1,5 +1,3 @@
-precision highp float;
-
 uniform sampler2D mirrorSampler;
 uniform float alpha;
 uniform float time;
@@ -11,7 +9,6 @@ uniform float uIntensity;
 uniform sampler2D uWaveTexture;
 uniform float uWaveSize;
 uniform float uWaveScale;
-uniform vec2 uWaveOffset;
 
 varying vec4 vMirrorCoord;
 varying vec4 vWorldPosition;
@@ -33,6 +30,7 @@ vec4 normalNoise(vec2 uv, float time) {
   return noise * 0.5 - 1.0;
 }
 
+// 双线性插值使涟漪平滑过渡
 vec4 bilinearInterpolation(sampler2D t, vec2 uv, float texelSize) {
   // 计算纹理坐标所在像素的左下角坐标
   vec2 uvMin = floor(uv / texelSize) * texelSize;
@@ -48,7 +46,6 @@ vec4 bilinearInterpolation(sampler2D t, vec2 uv, float texelSize) {
   float tl = texture2D(t, vec2(uvMin.x, uvMax.y)).r; // 左上
   float tr = texture2D(t, uvMax).r; // 右上
 
-  // 使用双线性插值计算最终的颜色值
   float bottom = mix(bl, br, f.x); // 对 x 方向进行线性插值
   float top = mix(tl, tr, f.x);    // 对 x 方向进行线性插值
   return vec4(mix(bottom, top, f.y)); // 对 y 方向进行线性插值
@@ -72,15 +69,15 @@ void main() {
   // 判断当前 UV 是否在中心区域内
   if (spray <= 0. && vUv.x > minUv.x && vUv.x < maxUv.x && vUv.y > minUv.y && vUv.y < maxUv.y) {
     // 将中心区域的 UV 映射到 [0, 1] 范围内
-    vec2 centeredUv = (vUv - minUv - uWaveScale * uWaveOffset) / (maxUv - minUv);
+    vec2 centeredUv = (vUv - minUv) / (maxUv - minUv);
 
     float wCell = 1. / uWaveSize; // 涟漪纹理单个像素的大小
 
     wave = bilinearInterpolation(uWaveTexture, centeredUv, wCell).r;
 
     // 截取值范围
-    float minRange = 0.125;
-    float maxRange = 0.25;
+    float minRange = 0.05;
+    float maxRange = 0.2;
     wave = clamp((wave - minRange) / (maxRange - minRange), 0.0, 1.0);
     wave = step(minRange, wave) * intensity;
   }

@@ -1,4 +1,4 @@
-import { Matrix4, Mesh, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, TextureLoader, Uniform, Vector2, Vector3, Vector4, WebGLRenderTarget } from "three"
+import { Matrix4, Mesh, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, Uniform, Vector2, Vector3, Vector4, WebGLRenderTarget } from "three"
 import { GPUComputationRenderer } from "three/examples/jsm/Addons.js"
 
 import WaterMaterial from "../materials/WaterMaterial"
@@ -59,8 +59,7 @@ export default class Water extends Mesh {
 
     const uniforms = gpgpu.waveVariable.material.uniforms
     uniforms.uTime = new Uniform(0)
-    uniforms.uPlayerUv = new Uniform(new Vector2())
-    uniforms.uPlayerUvOffset = new Uniform(new Vector2())
+    uniforms.uOffsetUv = new Uniform(new Vector2())
 
     // 将变量自己作为依赖项，将现在的状态发送到下一次计算中，达到数据可持续化的效果
     gpgpu.computation.setVariableDependencies(gpgpu.waveVariable, [gpgpu.waveVariable])
@@ -69,7 +68,6 @@ export default class Water extends Mesh {
     // 降低更新频率
     this.timer = setInterval(() => {
       this.gpgpu.computation.compute()
-      this.view.state.water.resetOffset()
     }, 66.66)
   }
 
@@ -221,23 +219,22 @@ export default class Water extends Mesh {
   }
 
   update() {
-    // const playerState = this.view.state.player
     const clock = this.view.clock
     const sunState = this.view.state.sun
     const waterSate = this.view.state.water
 
     // GPGPU update
     const waveUniforms = this.gpgpu.waveVariable.material.uniforms
-    waveUniforms.uPlayerUv.value.set(...waterSate.playerUv)
+    waveUniforms.uOffsetUv.value.set(...waterSate.offsetUv)
     // this.gpgpu.computation.compute()
 
     const uniforms = this.material.uniforms
     uniforms.time.value = clock.elapsed
     uniforms.uIntensity.value = sunState.intensity
     uniforms.uWaveTexture.value = this.gpgpu.computation.getCurrentRenderTarget(this.gpgpu.waveVariable).texture
-    uniforms.uWaveOffset.value.set(...waterSate.playerUvOffset)
 
     this.position.set(...waterSate.position)
+
   }
 
   setDebug() {
