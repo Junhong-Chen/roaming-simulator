@@ -29,14 +29,15 @@ export default class App {
     this.resize()
     this.viewport.on('resize', this.resize)
 
-    this.clock.on('tick', this.update)
-
     this.loader.on('loaded', resources => {
+      this.audios.load(resources)
       this.state.load(resources)
       this.view.load(resources)
+      this.update({ deltaTime: 1 / 60})
       
       this.ui.on('start', () => {
-        this.audios.load(resources)
+        this.clock.on('tick', this.update)
+        this.state.sounds.enbaled()
       })
     })
   }

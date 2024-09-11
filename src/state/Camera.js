@@ -198,7 +198,7 @@ export class CameraFly {
     if (controls.keys.down.crouch)
       vec3.add(direction, direction, this.downward)
 
-    const speed = (controls.keys.down.boost ? 30 : 10) * this.state.clock.delta
+    const speed = (controls.keys.down.boost ? 20 : 10) * this.state.clock.delta
 
     vec3.normalize(direction, direction)
     vec3.scale(direction, direction, speed)

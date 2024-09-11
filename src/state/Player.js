@@ -170,7 +170,6 @@ export default class Player extends EventEmitter {
 
     // Update view
     this.camera.update()
-
   }
 
   stepSoundPlay(time, action) {

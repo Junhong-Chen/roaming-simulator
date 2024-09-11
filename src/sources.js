@@ -1,3 +1,9 @@
+export const DATA_TYPE = {
+  TEXTURE: 'texture',
+  GLTF: 'gltf',
+  AUDIO: 'audio'
+}
+
 export default [
   {
     name: "water",
@@ -10,7 +16,7 @@ export default [
     name: "sky",
     type: "texture",
     paths: [
-      "/textures/lensflare.png"
+      "textures/lensflare.png"
     ]
   },
   {

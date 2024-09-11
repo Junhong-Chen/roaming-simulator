@@ -11,7 +11,7 @@ export default class Sounds {
 
     const musicEl = document.querySelector('#music')
 
-    musicEl.addEventListener('click', (e) => {
+    this.enbaled = () => {
       this.enable = !this.enable
 
       if (!this.enable) {
@@ -21,7 +21,9 @@ export default class Sounds {
       } else {
         musicEl.classList.remove('disabled')
       }
-    })
+    }
+
+    musicEl.addEventListener('click', this.enbaled, false)
 
     state.day.on('sunrise', stamp => {
       if (stamp && this.enable) {
@@ -38,7 +40,8 @@ export default class Sounds {
     })
 
     state.player.on('moving', ({ terrain, action }) => {
-      this.audios.play(`${terrain}/${action}/${this.getSoundRamdom(terrain, action)}`)
+      const audioName = `/${import.meta.env.VITE_BASE_PATH}/sounds/${terrain}/${action}/${this.getSoundRamdom(terrain, action)}.ogg`
+      this.audios.play(audioName)
     })
   }
 

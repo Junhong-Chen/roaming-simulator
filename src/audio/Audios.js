@@ -12,16 +12,18 @@ export const SOUNDS = {
 export default class Audios {
   #audios = {}
 
-  constructor() {}
-  
+  constructor() { }
+
   load(files) {
     this.listener = new AudioListener() // 控制音频及音频空间化的核心组件
-    files.get('bgm').forEach(({ file: audioBuffer  }) => {
-      this.#audios[audioBuffer.name] = new Audio(this.listener)
-      this.#audios[audioBuffer.name].setBuffer(audioBuffer)
+    files.get('bgm').forEach(({ file: audioBuffer }) => {
+      const fileName = audioBuffer.name.replace(/(.*\/)*([^.]+).*/ig, '$2')
+
+      this.#audios[fileName] = new Audio(this.listener)
+      this.#audios[fileName].setBuffer(audioBuffer)
     })
 
-    files.get('sounds').forEach(({ file: audioBuffer  }) => {
+    files.get('sounds').forEach(({ file: audioBuffer }) => {
       this.#audios[audioBuffer.name] = new Audio(this.listener)
       this.#audios[audioBuffer.name].setBuffer(audioBuffer)
       if (audioBuffer.name.includes('sand'))
@@ -38,7 +40,7 @@ export default class Audios {
   pause(name) {
     this.#audios[name].pause()
   }
-  
+
   stop(name) {
     this.#audios[name].stop()
   }
