@@ -2,16 +2,26 @@
   --color-white: hsl(0, 0%, 80%);
   --color-black: #111;
 
+  --color-font: #123;
+
   --color-bg: #cba;
   
-  --color-linear-0: #432;
-  --color-linear-1: #654;
-  --color-linear-2: #432;
+  --color-linear-0: #9ed3fd;
+  --color-linear-1: #c4fcfe;
+  --color-linear-2: #f4f4f4;
+}
+
+@font-face {
+  font-family: pixels;
+  src: url('/roaming-simulator/font/font-pixels.ttf');
+  font-style: normal;
+  font-weight: normal;
 }
 
 html, body {
   padding: 0;
   margin: 0;
+  font-family: pixels, auto;
 }
 
 body {
@@ -20,11 +30,7 @@ body {
   width: 100vw;
   height: 100vh;
   background: var(--color-black);
-  cursor: grab;
-}
-
-.grabbing {
-  cursor: grabbing;
+  cursor: crosshair;
 }
 
 .hide {
@@ -36,11 +42,12 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: var(--color-bg);
+  background: linear-gradient(to bottom, var(--color-linear-0), var(--color-linear-1), var(--color-linear-2));
   cursor: auto;
   opacity: 1;
   transition: opacity .5s;
   will-change: opacity;
+  user-select: none;
 }
 
 #game {
@@ -54,22 +61,17 @@ body {
   width: 50%;
   height: 10px;
   padding: 4px;
-  transform: translate(-50%, -50%);
-  border: 4px solid transparent;
-  border-radius: 6px;
-  background-clip: padding-box, border-box;
-  background-origin: padding-box, border-box;
-  background-image: linear-gradient(to right, var(--color-bg), var(--color-bg)), 
-                    linear-gradient(135deg, var(--color-linear-0), var(--color-linear-1), var(--color-linear-2));
+  transform: translate(-50%, calc(-50% + 4vw));
+  border: 4px solid var(--color-black);
   transition: all 1s;
-  user-select: none;
   cursor: pointer;
   pointer-events: none;
+  will-change: width, height, opacity;
 }
 
 #entry.ready {
-  width: 15%;
-  height: 3vw;
+  width: 10%;
+  height: 2vw;
   pointer-events: all;
 }
 
@@ -77,37 +79,51 @@ body {
   opacity: 0;
 }
 
-#entry.ready > #tips {
+#entry.ready > #start {
   opacity: 1;
+  transform: translate(calc(-50% + 0.5ch), -50%) scale(1);
+}
+
+#title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  transform: translate(-50%, calc(-50% - 2vw));
+  font-size: 4vw;
+  letter-spacing: 0.2ch;
+  color: var(--color-font);
+  /* background-clip: text;
+  -webkit-text-fill-color: transparent; */
 }
 
 #bar {
   position: relative;
   width: 0%;
   height: 100%;
-  background-image: linear-gradient(to right, transparent 8px, var(--color-bg) 4px),
-                    linear-gradient(135deg, var(--color-linear-0), var(--color-linear-1), var(--color-linear-2));
+  background-image: linear-gradient(to right, var(--color-black) 8px, transparent 4px);
   background-size: 12px auto, 100% auto;
   background-origin: content-box;
   transition: all 0.5s;
+  will-change: opacity;
 }
 
-#tips {
+#start {
   opacity: 0;
   position: absolute;
   text-align: center;
-  color: var(--color-white);
+  color: var(--color-font);
   top: 50%;
   left: 50%;
   width: 100%;
-  transition: opacity .5s;
-  transform: translate(calc(-50% + 1ch), -50%);
-  font-size: 1.5vw;
-  letter-spacing: 2ch;
-  background-image: linear-gradient(135deg, var(--color-linear-0), var(--color-linear-1), var(--color-linear-2));
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: bold;
+  transition: all .5s;
+  transform: translate(calc(-50% + 0.5ch), -50%) scale(0);
+  font-size: 1.2vw;
+  letter-spacing: 1ch;
+  color: var(--color-black);
+  /* background-clip: text;
+  -webkit-text-fill-color: transparent; */
+  will-change: transform, opacity;
 }
 
 #music {
