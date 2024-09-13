@@ -33,10 +33,6 @@ body {
   cursor: crosshair;
 }
 
-.hide {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
 
 #ui {
   position: absolute;
@@ -46,8 +42,13 @@ body {
   cursor: auto;
   opacity: 1;
   transition: opacity .5s;
-  will-change: opacity;
+  will-change: opacity, transform;
   user-select: none;
+}
+
+#ui.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 
 #game {
@@ -136,9 +137,7 @@ body {
   padding: 4px;
   border: 2px solid;
   border-radius: 50%;
-  background-clip: content-box;
-  background: url("/roaming-simulator/images/music.png") center / 75% no-repeat;
-  transform-origin: cneter;
+  background: url("/roaming-simulator/images/music.png") center / 70% no-repeat;
   animation: 8s linear infinite rotate;
   cursor: pointer;
 }
