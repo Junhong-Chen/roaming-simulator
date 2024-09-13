@@ -15,6 +15,18 @@ export default class Controls extends EventEmitter {
 
       location.reload()
     })
+
+    // 记录用户最后一次操作时间
+    this.lastActionTime = Date.now()
+    // 是否处于待机状态
+    this.isIdle = false
+    // 设置 10 秒的超时时间
+    this.idleTimeout = 5000
+  }
+
+  updateIdleStatus() {
+    this.lastActionTime = Date.now()
+    this.isIdle = false
   }
 
   setKeys() {
@@ -41,6 +53,10 @@ export default class Controls extends EventEmitter {
       {
         codes: ['ShiftLeft', 'ShiftRight'],
         name: 'boost'
+      },
+      {
+        codes: ['AltLeft', 'AltRight'],
+        name: 'pointerLock'
       },
       {
         codes: ['KeyV'],
@@ -84,6 +100,7 @@ export default class Controls extends EventEmitter {
         this.emit('keyDown', mapItem.name)
         this.emit(`${mapItem.name}Down`)
         this.keys.down[mapItem.name] = true
+        this.updateIdleStatus()
       }
     })
 
@@ -94,6 +111,7 @@ export default class Controls extends EventEmitter {
         this.emit('keyUp', mapItem.name)
         this.emit(`${mapItem.name}Up`)
         this.keys.down[mapItem.name] = false
+        this.updateIdleStatus()
       }
     })
   }
@@ -106,15 +124,21 @@ export default class Controls extends EventEmitter {
 
     window.addEventListener('pointerdown', (event) => {
       this.pointer.down = true
+      this.updateIdleStatus()
     })
 
     window.addEventListener('pointermove', (event) => {
       this.pointer.deltaTemp.x += event.movementX
       this.pointer.deltaTemp.y += event.movementY
+      this.updateIdleStatus()
     })
 
     window.addEventListener('pointerup', () => {
+      // 鼠标锁定
+      document.body.requestPointerLock()
+
       this.pointer.down = false
+      this.updateIdleStatus()
     })
   }
 
@@ -124,5 +148,18 @@ export default class Controls extends EventEmitter {
 
     this.pointer.deltaTemp.x = 0
     this.pointer.deltaTemp.y = 0
+
+    // 检查是否进入待机状态
+    const currentTime = Date.now()
+    if (currentTime - this.lastActionTime > this.idleTimeout && !this.isIdle) {
+      this.isIdle = true
+    } else if (!this.isIdle) {
+      this.isIdle = false
+    }
+
+    // 如果处于待机状态，相机绕角色旋转
+    if (this.isIdle) {
+      this.pointer.delta.x = 0.5  // 设置一个小的值，让相机缓慢旋转
+    }
   }
 }

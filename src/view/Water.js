@@ -36,7 +36,7 @@ export default class Water extends Mesh {
   }
 
   createWave() {
-    const size = 512 // 纹理大小
+    const size = 256 // 纹理大小
     this.material.uniforms.uWaveSize.value = size
     const gpgpu = this.gpgpu = {
       size

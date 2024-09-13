@@ -1,5 +1,6 @@
 import Camera from "./Camera"
 import Light from "./Light"
+// import Mask from "./Mask"
 import Player from "./Player"
 import Sky from "./Sky"
 import Terrains from "./Terrains"
@@ -16,6 +17,7 @@ export default class View {
     this.state = app.state
 
     this.camera = new Camera(this)
+    // this.mask = new Mask(this)
     this.player = new Player(this)
     this.light = new Light(this)
     this.sky = new Sky(this)

@@ -1,4 +1,4 @@
-import EventEmitter from "../core/EventEmitter"
+import EventEmitter from "./EventEmitter"
 
 export default class UI extends EventEmitter {
   constructor() {

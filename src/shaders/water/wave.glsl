@@ -21,7 +21,7 @@ void main() {
 
   // 角色移动
   if((length(vec2(.5) - uv) < p.x) && t.ba != uOffsetUv) { // 由中心点开始散播值
-    wave = .5;
+    wave = 1.;
   }
 
   t.g = t.r; // g 为上一帧的值，r 为当前帧的值

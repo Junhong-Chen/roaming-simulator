@@ -21,21 +21,10 @@ export default class Player {
           child.receiveShadow = true
         }
       })
+      model.rotation.y = -Math.PI
       this.group.add(model)
 
     }
-  }
-
-  setActionWeight(action, weight) {
-    action.enabled = true
-    action.setEffectiveTimeScale(1)
-    action.setEffectiveWeight(weight)
-  }
-
-  changeAction(before, current, duration = 0.5) {
-    current.time = 0
-    this.setActionWeight(current, 1)
-    before.crossFadeTo(current, duration, true)
   }
 
   update() {

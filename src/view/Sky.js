@@ -73,6 +73,8 @@ export default class Sky {
     this.sun.mesh.add(lensflare)
   }
 
+  setCloud() {}
+
   setStars() {
     this.stars = {}
     this.stars.count = 500

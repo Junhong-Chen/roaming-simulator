@@ -39,17 +39,18 @@ export default class Camera {
   }
 
   update() {
-    this.thirdPerson.update()
-    this.fly.update()
 
-    if (this.mode === Camera.MODE_THIRDPERSON) {
-      vec3.copy(this.position, this.thirdPerson.position)
-      quat2.copy(this.quaternion, this.thirdPerson.quaternion)
-    }
-
-    else if (this.mode === Camera.MODE_FLY) {
-      vec3.copy(this.position, this.fly.position)
-      quat2.copy(this.quaternion, this.fly.quaternion)
+    switch (this.mode) {
+      case Camera.MODE_THIRDPERSON:
+        this.thirdPerson.update()
+        vec3.copy(this.position, this.thirdPerson.position)
+        quat2.copy(this.quaternion, this.thirdPerson.quaternion)
+        break
+      case Camera.MODE_FLY:
+        this.fly.update()
+        vec3.copy(this.position, this.fly.position)
+        quat2.copy(this.quaternion, this.fly.quaternion)
+        break
     }
 
   }
@@ -215,8 +216,16 @@ export class CameraThirdPerson {
     this.position = vec3.create()
     this.quaternion = quat2.create()
     this.distance = 4
-    this.phi = Math.PI * 0.45
-    this.theta = - Math.PI * 0.25
+
+    // 当前角度
+    this.phi = Math.PI * 0.4
+    this.theta = 0
+    // 目标角度
+    this.targetPhi = this.phi;
+    this.targetTheta = this.theta;
+
+    this.smoothFactor = 0.2
+
     this.aboveOffset = 2
     this.phiLimits = { min: 0.1, max: Math.PI - 0.1 }
   }
@@ -235,16 +244,18 @@ export class CameraThirdPerson {
 
     // Phi and theta
     const { controls, viewport, player } = this.state
-    if (controls.pointer.down) {
-      const normalisedPointer = viewport.normalise(controls.pointer.delta)
-      this.phi -= normalisedPointer.y * 2
-      this.theta -= normalisedPointer.x * 2
+    const normalisedPointer = viewport.normalise(controls.pointer.delta)
+    this.targetPhi -= normalisedPointer.y
+    this.targetTheta -= normalisedPointer.x
 
-      if (this.phi < this.phiLimits.min)
-        this.phi = this.phiLimits.min
-      if (this.phi > this.phiLimits.max)
-        this.phi = this.phiLimits.max
-    }
+    // 缓动：使用线性插值（lerp）或指数平滑
+    this.phi += (this.targetPhi - this.phi) * this.smoothFactor
+    this.theta += (this.targetTheta - this.theta) * this.smoothFactor
+
+    if (this.phi < this.phiLimits.min)
+      this.phi = this.phiLimits.min
+    if (this.phi > this.phiLimits.max)
+      this.phi = this.phiLimits.max
 
     // Position
     const sinPhiRadius = Math.sin(this.phi) * this.distance

@@ -80,7 +80,6 @@ export default class Player extends EventEmitter {
     before.crossFadeTo(current, duration, true)
   }
 
-
   update(deltaTime) {
     const controls = this.state.controls
     this.beforeAction = this.action
@@ -90,11 +89,13 @@ export default class Player extends EventEmitter {
     let swim = false
 
     // Update elevation
-    if (elevation && elevation > -1 - 0.01) // EPSILON
-      this.position[1] = elevation
-    else {
-      this.position[1] = -1
-      swim = true
+    if (elevation) {
+      if (elevation > -1 - 0.01) {
+        this.position[1] = elevation
+      } else {
+        this.position[1] = -1
+        swim = true
+      }
     }
 
     // Moving
