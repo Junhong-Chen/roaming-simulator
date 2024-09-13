@@ -15,7 +15,7 @@ export default class State {
     this.clock = app.clock
     this.viewport = app.viewport
 
-    this.controls = new Controls()
+    this.controls = new Controls(this)
     this.day = new Day(this)
     this.sun = new Sun(this)
     this.player = new Player(this)
@@ -27,6 +27,11 @@ export default class State {
 
   load(resources) {
     this.player.load(resources)
+  }
+
+  ready() {
+    this.sounds.enabled()
+    this.controls.enabled()
   }
 
   update(deltaTime, elapsedTime) {

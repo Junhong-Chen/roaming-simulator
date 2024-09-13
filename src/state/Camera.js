@@ -153,16 +153,15 @@ export class CameraFly {
     // Rotation X and Y
     const controls = this.state.controls
     const viewport = this.state.viewport
-    if (controls.pointer.down) {
-      const normalisedPointer = viewport.normalise(controls.pointer.delta)
-      this.rotateX -= normalisedPointer.y * 2
-      this.rotateY -= normalisedPointer.x * 2
+    const normalisedPointer = viewport.normalise(controls.pointer.delta)
 
-      if (this.rotateX < this.rotateXLimits.min)
-        this.rotateX = this.rotateXLimits.min
-      if (this.rotateX > this.rotateXLimits.max)
-        this.rotateX = this.rotateXLimits.max
-    }
+    this.rotateX -= normalisedPointer.y
+    this.rotateY -= normalisedPointer.x
+
+    if (this.rotateX < this.rotateXLimits.min)
+      this.rotateX = this.rotateXLimits.min
+    if (this.rotateX > this.rotateXLimits.max)
+      this.rotateX = this.rotateXLimits.max
 
     // Rotation Matrix
     const rotationMatrix = mat4.create()
@@ -215,7 +214,7 @@ export class CameraThirdPerson {
     this.gameUp = vec3.fromValues(0, 1, 0)
     this.position = vec3.create()
     this.quaternion = quat2.create()
-    this.distance = 4
+    this.distance = 10
 
     // 当前角度
     this.phi = Math.PI * 0.4
@@ -248,14 +247,20 @@ export class CameraThirdPerson {
     this.targetPhi -= normalisedPointer.y
     this.targetTheta -= normalisedPointer.x
 
+    if (this.distance > 4.01) {
+      this.distance += (4 - this.distance) * 0.05
+    } else {
+      this.distance = 4
+    }
+
     // 缓动：使用线性插值（lerp）或指数平滑
     this.phi += (this.targetPhi - this.phi) * this.smoothFactor
     this.theta += (this.targetTheta - this.theta) * this.smoothFactor
 
     if (this.phi < this.phiLimits.min)
-      this.phi = this.phiLimits.min
+      this.phi = this.targetPhi = this.phiLimits.min
     if (this.phi > this.phiLimits.max)
-      this.phi = this.phiLimits.max
+      this.phi = this.targetPhi = this.phiLimits.max
 
     // Position
     const sinPhiRadius = Math.sin(this.phi) * this.distance

@@ -21,14 +21,19 @@ export default class Audios {
 
       this.#audios[fileName] = new Audio(this.listener)
       this.#audios[fileName].setBuffer(audioBuffer)
+
+      if (fileName === 'aurora') {
+        this.#audios[fileName].setVolume(0.5)
+      }
     })
 
     files.get('sounds').forEach(({ file: audioBuffer }) => {
       this.#audios[audioBuffer.name] = new Audio(this.listener)
       this.#audios[audioBuffer.name].setBuffer(audioBuffer)
       if (audioBuffer.name.includes('sand'))
-        this.#audios[audioBuffer.name].setVolume(0.1) // sand 的音源声音有点大
+        this.#audios[audioBuffer.name].setVolume(0.1) // 调整部分音源音量
     })
+
   }
 
   play(name) {

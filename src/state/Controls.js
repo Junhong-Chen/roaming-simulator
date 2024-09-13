@@ -4,9 +4,6 @@ export default class Controls extends EventEmitter {
   constructor() {
     super()
 
-    this.setKeys()
-    this.setPointer()
-
     this.on('debugDown', () => {
       if (location.hash === '#debug')
         location.hash = ''
@@ -22,11 +19,55 @@ export default class Controls extends EventEmitter {
     this.isIdle = false
     // 设置 10 秒的超时时间
     this.idleTimeout = 5000
+
+    this.setKeys()
+    this.setPointer()
   }
 
-  updateIdleStatus() {
-    this.lastActionTime = Date.now()
-    this.isIdle = false
+  enabled() {
+    // 鼠标锁定（用户进入游戏）
+    document.body.requestPointerLock()
+
+    // Event
+    window.addEventListener('keydown', (event) => {
+      const mapItem = this.keys.findPerCode(event.code)
+
+      if (mapItem) {
+        this.emit('keyDown', mapItem.name)
+        this.emit(`${mapItem.name}Down`)
+        this.keys.down[mapItem.name] = true
+        this.updateIdleStatus()
+      }
+    })
+
+    window.addEventListener('keyup', (event) => {
+      const mapItem = this.keys.findPerCode(event.code)
+
+      if (mapItem) {
+        this.emit('keyUp', mapItem.name)
+        this.emit(`${mapItem.name}Up`)
+        this.keys.down[mapItem.name] = false
+        this.updateIdleStatus()
+      }
+    })
+
+    window.addEventListener('pointerdown', (event) => {
+      this.pointer.down = true
+      this.updateIdleStatus()
+    })
+
+    window.addEventListener('pointermove', (event) => {
+      this.pointer.deltaTemp.x += event.movementX
+      this.pointer.deltaTemp.y += event.movementY
+      this.updateIdleStatus()
+    })
+
+    window.addEventListener('pointerup', () => {
+      document.body.requestPointerLock()
+
+      this.pointer.down = false
+      this.updateIdleStatus()
+    })
   }
 
   setKeys() {
@@ -92,28 +133,6 @@ export default class Controls extends EventEmitter {
       return this.keys.map.find((mapItem) => mapItem.codes.includes(key))
     }
 
-    // Event
-    window.addEventListener('keydown', (event) => {
-      const mapItem = this.keys.findPerCode(event.code)
-
-      if (mapItem) {
-        this.emit('keyDown', mapItem.name)
-        this.emit(`${mapItem.name}Down`)
-        this.keys.down[mapItem.name] = true
-        this.updateIdleStatus()
-      }
-    })
-
-    window.addEventListener('keyup', (event) => {
-      const mapItem = this.keys.findPerCode(event.code)
-
-      if (mapItem) {
-        this.emit('keyUp', mapItem.name)
-        this.emit(`${mapItem.name}Up`)
-        this.keys.down[mapItem.name] = false
-        this.updateIdleStatus()
-      }
-    })
   }
 
   setPointer() {
@@ -121,25 +140,11 @@ export default class Controls extends EventEmitter {
     this.pointer.down = false
     this.pointer.deltaTemp = { x: 0, y: 0 }
     this.pointer.delta = { x: 0, y: 0 }
+  }
 
-    window.addEventListener('pointerdown', (event) => {
-      this.pointer.down = true
-      this.updateIdleStatus()
-    })
-
-    window.addEventListener('pointermove', (event) => {
-      this.pointer.deltaTemp.x += event.movementX
-      this.pointer.deltaTemp.y += event.movementY
-      this.updateIdleStatus()
-    })
-
-    window.addEventListener('pointerup', () => {
-      // 鼠标锁定
-      document.body.requestPointerLock()
-
-      this.pointer.down = false
-      this.updateIdleStatus()
-    })
+  updateIdleStatus() {
+    this.lastActionTime = Date.now()
+    this.isIdle = false
   }
 
   update() {

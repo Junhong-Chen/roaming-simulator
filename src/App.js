@@ -37,7 +37,7 @@ export default class App {
       
       this.ui.on('start', () => {
         this.clock.on('tick', this.update)
-        this.state.sounds.enbaled()
+        this.state.ready()
       })
     })
   }

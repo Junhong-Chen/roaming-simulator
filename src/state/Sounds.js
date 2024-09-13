@@ -11,7 +11,7 @@ export default class Sounds {
 
     const musicEl = document.querySelector('#music')
 
-    this.enbaled = () => {
+    this.enabled = () => {
       this.enable = !this.enable
 
       if (!this.enable) {
@@ -23,7 +23,7 @@ export default class Sounds {
       }
     }
 
-    musicEl.addEventListener('click', this.enbaled, false)
+    musicEl.addEventListener('click', this.enabled, false)
 
     state.day.on('sunrise', stamp => {
       if (stamp && this.enable) {

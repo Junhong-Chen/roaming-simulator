@@ -17,7 +17,7 @@ export default class AurorasMaterial extends ShaderMaterial {
       },
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
-			side: DoubleSide,
+			side: BackSide,
 			depthWrite: false,
       blending: AdditiveBlending
     })

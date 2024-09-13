@@ -1,9 +1,11 @@
-import { BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, Points, Scene, Vector3, WebGLRenderTarget, Group, BoxGeometry, TextureLoader, Uniform, Matrix4 } from "three"
+import { BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, Points, Scene, Vector3, WebGLRenderTarget, Group, BoxGeometry, TextureLoader, Uniform, Matrix4, Data3DTexture, RedFormat, LinearFilter, PlaneGeometry } from "three"
+import { ImprovedNoise, Lensflare, LensflareElement } from "three/addons"
 
 import SkyMaterial from "../materials/SkyMaterial.js"
 import StarsMaterial from "../materials/StarsMaterial.js"
-import { Lensflare, LensflareElement } from "three/examples/jsm/Addons.js"
+import CloudMaterial from "../materials/CloudMaterial.js"
 import AurorasMaterial from "../materials/AurorasMaterial.js"
+
 
 export default class Sky {
   constructor(view) {
@@ -17,6 +19,7 @@ export default class Sky {
     this.setBackground()
     this.setAuroras()
     this.setSun()
+    // this.setCloud()
     this.setStars()
     this.setDebug()
   }
@@ -30,11 +33,11 @@ export default class Sky {
   setBackground() {
     this.background = {}
     this.background.mesh = new Mesh(
-      new BoxGeometry(1, 1, 1),
+      new BoxGeometry(),
       new SkyMaterial()
     )
-
     this.background.mesh.scale.setScalar(10000)
+
     this.group.add(this.background.mesh)
   }
 
@@ -44,11 +47,11 @@ export default class Sky {
     material.uniforms.uResolution.value.set(this.view.viewport.width, this.view.viewport.height)
 
     this.auroras.mesh = new Mesh(
-      new BoxGeometry(1, 1, 1),
+      new BoxGeometry(),
       material
     )
-
     this.auroras.mesh.scale.setScalar(10000)
+
     this.group.add(this.auroras.mesh)
   }
 
@@ -63,7 +66,7 @@ export default class Sky {
 
   }
 
-  setLensflare (textureFlare) {
+  setLensflare(textureFlare) {
     // 光晕
     const lensflare = new Lensflare()
     lensflare.addElement(new LensflareElement(textureFlare, 20, 0.75, new Color(0x33ff33)))
@@ -73,7 +76,17 @@ export default class Sky {
     this.sun.mesh.add(lensflare)
   }
 
-  setCloud() {}
+  setCloud() {
+    this.cloud = {}
+
+    const geometry = new BoxGeometry()
+    const material = new CloudMaterial()
+    
+    this.cloud.mesh = new Mesh(geometry, material)
+    this.cloud.mesh.scale.setScalar(100)
+
+    this.view.scene.add(this.cloud.mesh)
+  }
 
   setStars() {
     this.stars = {}
@@ -148,8 +161,7 @@ export default class Sky {
     starsFolder.add(this.stars.material.uniforms.uBrightness, 'value').min(0).max(1).step(0.001).name('uBrightness')
   }
 
-  update() {
-    const dayState = this.view.state.day
+  update(deltaTime, elapsedTime) {
     const sunState = this.view.state.sun
     const playerState = this.view.state.player
     const camera = this.view.camera
@@ -181,6 +193,11 @@ export default class Sky {
       playerState.position[1],
       playerState.position[2]
     )
+
+    // Cloud
+    // const cloudUniforms = this.cloud.mesh.material.uniforms
+    // cloudUniforms.time.value = elapsedTime
+    // cloudUniforms.cameraPosition.value.copy(camera.position)
 
     // Stars
     const starsUniforms = this.stars.material.uniforms
