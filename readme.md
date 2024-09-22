@@ -18,6 +18,7 @@ In **Roaming Simulator**, there are no objectives, enemies, or challenges. The o
 ## Controls
 
 - **W/A/S/D or Arrow Keys**: Move the character
+- **Shift**: Sprint (run faster)
 - **Mouse**: Look around
 
 ## License
