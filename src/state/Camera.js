@@ -257,6 +257,15 @@ export class CameraThirdPerson {
     this.phi += (this.targetPhi - this.phi) * this.smoothFactor
     this.theta += (this.targetTheta - this.theta) * this.smoothFactor
 
+    // 避免数值 "震荡"
+    const epsilon = 0.001
+    if (Math.abs(this.targetPhi - this.phi) < epsilon) {
+      this.phi = this.targetPhi
+    }
+    if (Math.abs(this.targetTheta - this.theta) < epsilon) {
+      this.theta = this.targetTheta
+    }
+
     if (this.phi < this.phiLimits.min)
       this.phi = this.targetPhi = this.phiLimits.min
     if (this.phi > this.phiLimits.max)
@@ -292,7 +301,7 @@ export class CameraThirdPerson {
     if (elevation < low) elevation = low
 
     // 相机位置始终高于地形位置 1.25 个高度
-    if (this.position[1] < elevation + 1.25) // EPSILON
+    if (this.position[1] < elevation + 1.25)
       this.position[1] = elevation + 1.25
   }
 }

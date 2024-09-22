@@ -20,7 +20,7 @@ void main() {
   float wave = ((up + down + left + right) * 0.5 - t.g) * decay;
 
   // 角色移动
-  if((length(vec2(.5) - uv) < p.x) && t.ba != uOffsetUv) { // 由中心点开始散播值
+  if((length(vec2(.5) - uv) < p.x * 4.) && t.ba != uOffsetUv) { // 由中心点开始散播值
     wave = 1.;
   }
 

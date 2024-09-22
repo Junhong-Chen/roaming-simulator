@@ -76,8 +76,8 @@ void main() {
     wave = bilinearInterpolation(uWaveTexture, centeredUv, wCell).r;
 
     // 截取值范围
-    float minRange = 0.04;
-    float maxRange = 0.08;
+    float minRange = 0.1;
+    float maxRange = 0.2;
     wave = clamp((wave - minRange) / (maxRange - minRange), 0.0, 1.0);
     wave = step(minRange, wave) * intensity;
   }

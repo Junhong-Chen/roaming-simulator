@@ -1,5 +1,5 @@
 import { BufferGeometry, CircleGeometry, Color, Float32BufferAttribute, Mesh, MeshBasicMaterial, Points, Scene, Vector3, WebGLRenderTarget, Group, BoxGeometry, TextureLoader, Uniform, Matrix4, Data3DTexture, RedFormat, LinearFilter, PlaneGeometry } from "three"
-import { ImprovedNoise, Lensflare, LensflareElement } from "three/addons"
+import { Lensflare, LensflareElement } from "three/addons"
 
 import SkyMaterial from "../materials/SkyMaterial.js"
 import StarsMaterial from "../materials/StarsMaterial.js"
