@@ -68,7 +68,7 @@ export default class Sky {
 
   setLensflare(textureFlare) {
     // 光晕
-    const lensflare = new Lensflare()
+    const lensflare = this.lensflare = new Lensflare()
     lensflare.addElement(new LensflareElement(textureFlare, 20, 0.75, new Color(0x33ff33)))
     lensflare.addElement(new LensflareElement(textureFlare, 100, 0.8), new Color(0xffff00))
     lensflare.addElement(new LensflareElement(textureFlare, 30, 1, new Color(0x48c9b0)))
@@ -193,6 +193,7 @@ export default class Sky {
       playerState.position[1],
       playerState.position[2]
     )
+    this.lensflare.visible = sunState.intensity < 0.5 ? false : true
 
     // Cloud
     // const cloudUniforms = this.cloud.mesh.material.uniforms

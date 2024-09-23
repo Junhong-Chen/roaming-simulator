@@ -11,6 +11,7 @@ export default class WaterMaterial extends ShaderMaterial {
         UniformsLib['lights'],
         {
           normalSampler: new Uniform(null),
+          depthSampler: new Uniform(null),
           mirrorSampler: new Uniform(null),
           alpha: new Uniform(0.75),
           time: new Uniform(0),
@@ -18,10 +19,12 @@ export default class WaterMaterial extends ShaderMaterial {
           distortionScale: new Uniform(0.01), // 倒影失真系数
           textureMatrix: new Uniform(new Matrix4()),
           eye: new Uniform(new Vector3()),
-          uIntensity: new Uniform(1),
-          uWaveTexture: new Uniform(null),
-          uWaveSize: new Uniform(1),
-          uWaveScale: new Uniform(1),
+          near: new Uniform(1),
+          far: new Uniform(1000),
+          intensity: new Uniform(1),
+          waveTexture: new Uniform(null),
+          waveSize: new Uniform(1),
+          waveScale: new Uniform(1),
         }
       ]),
       vertexShader,

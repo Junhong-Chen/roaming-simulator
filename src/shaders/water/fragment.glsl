@@ -1,18 +1,24 @@
+uniform sampler2D normalSampler;
+uniform sampler2D depthSampler;
 uniform sampler2D mirrorSampler;
 uniform float alpha;
 uniform float time;
 uniform float size;
 uniform float distortionScale;
-uniform sampler2D normalSampler;
 uniform vec3 eye;
-uniform float uIntensity;
-uniform sampler2D uWaveTexture;
-uniform float uWaveSize;
-uniform float uWaveScale;
+uniform float intensity;
+uniform sampler2D waveTexture;
+uniform float waveSize;
+uniform float waveScale;
+uniform float near;
+uniform float far;
 
 varying vec4 vMirrorCoord;
 varying vec4 vWorldPosition;
+varying vec4 vPosition;
 varying vec2 vUv;
+
+#include <packing>
 
 vec4 normalNoise(vec2 uv, float time) {
 
@@ -51,46 +57,68 @@ vec4 bilinearInterpolation(sampler2D t, vec2 uv, float texelSize) {
   return vec4(mix(bottom, top, f.y)); // 对 y 方向进行线性插值
 }
 
+// 将深度值转为线性
+float NDCToLinear(float zNDC) {
+  float zView = (2.0 * far * near) / (zNDC * (far - near) - (far + near));
+  return -zView;
+}
+
 void main() {
   vec4 noise = normalNoise(vWorldPosition.xz * size, time * .1);
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
-  float intensity = smoothstep(-.5, 1.2, uIntensity);
+  float intensity = smoothstep(-.5, 1.2, intensity);
 
   // 浪花
   float spray = 1. - dot(surfaceNormal, vec3(0., 1., 0.));
-  spray = step(.1, spray) * intensity;
+  spray = step(.1, spray);
+
+  // 岸边
+  float boundry;
+  if (spray <= 0.) {
+    float z = vPosition.z / vPosition.w;
+    float depth = NDCToLinear(z);
+
+    vec3 pos = vPosition.xyz / vPosition.w * 0.5 + 0.5;
+    float depthSample = unpackRGBAToDepth(texture2D(depthSampler, pos.xy));
+    float sceneDepth = depthSample * (far - near) + near;
+    float diffDepth = sceneDepth - depth;
+
+    // [0, 0.1] => [0, 1]
+    boundry = clamp(diffDepth / .1, 0., 1.);
+    boundry = 1. - step(1., boundry);
+  }
 
   // 涟漪
-  vec2 minUv = vec2(0.5 - uWaveScale);
+  vec2 minUv = vec2(0.5 - waveScale);
   vec2 maxUv = vec2(1.0 - minUv.x, 1.0 - minUv.y);
   float wave;
 
   // 判断当前 UV 是否在中心区域内
-  if (spray <= 0. && vUv.x > minUv.x && vUv.x < maxUv.x && vUv.y > minUv.y && vUv.y < maxUv.y) {
+  if (spray + boundry <= 0. && vUv.x > minUv.x && vUv.x < maxUv.x && vUv.y > minUv.y && vUv.y < maxUv.y) {
     // 将中心区域的 UV 映射到 [0, 1] 范围内
     vec2 centeredUv = (vUv - minUv) / (maxUv - minUv);
 
-    float wCell = 1. / uWaveSize; // 涟漪纹理单个像素的大小
+    float wCell = 1. / waveSize; // 涟漪纹理单个像素的大小
 
-    wave = bilinearInterpolation(uWaveTexture, centeredUv, wCell).r;
+    wave = bilinearInterpolation(waveTexture, centeredUv, wCell).r;
 
     // 截取值范围
     float minRange = 0.1;
     float maxRange = 0.2;
     wave = clamp((wave - minRange) / (maxRange - minRange), 0.0, 1.0);
-    wave = step(minRange, wave) * intensity;
+    wave = step(minRange, wave);
   }
 
   // 倒影
   vec3 reflectionSample = vec3(0.);
-  if (wave + spray <= 0.) {
+  if (wave + spray + boundry <= 0.) {
     float t = 1.0 - clamp(0.0001 / distance(vUv, vec2(0.5)) - 0.5, 0.0, 1.0); // 角色倒影偏离矫正
     vec2 distortion = surfaceNormal.xz * distortionScale * t;
     reflectionSample = vec3(texture2D(mirrorSampler, vMirrorCoord.xy / vMirrorCoord.w + distortion));
   }
 
-  vec3 color = reflectionSample + spray + wave;
+  vec3 color = reflectionSample + (spray + wave + boundry) * intensity;
 
   gl_FragColor = vec4(color, alpha);
 }

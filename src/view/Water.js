@@ -1,8 +1,9 @@
-import { Matrix4, Mesh, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, Uniform, Vector2, Vector3, Vector4, WebGLRenderTarget } from "three"
+import { DepthTexture, FloatType, LinearFilter, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Plane, PlaneGeometry, RepeatWrapping, RGBAFormat, Uniform, UnsignedByteType, Vector2, Vector3, Vector4, WebGLRenderTarget } from "three"
 import { GPUComputationRenderer } from "three/examples/jsm/Addons.js"
 
 import WaterMaterial from "../materials/WaterMaterial"
 import waveShader from "../shaders/water/wave.glsl"
+import DepthMaterial from "../materials/DepthMaterial"
 
 export default class Water extends Mesh {
   constructor(view) {
@@ -13,10 +14,19 @@ export default class Water extends Mesh {
     this.material = new WaterMaterial({
       fog: view.scene.fog !== undefined
     })
-    this.material.uniforms.uWaveScale.value = waveScale
+    const uniforms = this.material.uniforms
+    const { near, far } = view.camera
+    uniforms.waveScale.value = waveScale
+    uniforms.near.value = near
+    uniforms.far.value = far
+
+    this.depthMaterial = new DepthMaterial()
+    const depthUniforms = this.depthMaterial.uniforms
+    depthUniforms.near.value = near
+    depthUniforms.far.value = far
 
     this.createRendererTarget()
-    
+
     this.createWave()
 
     this.setDebug()
@@ -31,13 +41,20 @@ export default class Water extends Mesh {
 
   createRendererTarget() {
     const { width, height } = this.view.viewport
-    this.renderTarget = new WebGLRenderTarget(width, height)
-    return this.renderTarget
+    this.mirrorRenderTarget = new WebGLRenderTarget(width, height)
+
+    this.depthRenderTarget = new WebGLRenderTarget(width, height, {
+      minFilter: LinearFilter,
+      magFilter: LinearFilter,
+      format: RGBAFormat,
+      type: FloatType // 高精度浮点纹理
+    })
+    // this.depthRenderTarget.depthTexture = new DepthTexture()
   }
 
   createWave() {
     const size = 512 // 纹理大小
-    this.material.uniforms.uWaveSize.value = size
+    this.material.uniforms.waveSize.value = size
     const gpgpu = this.gpgpu = {
       size
     }
@@ -72,8 +89,9 @@ export default class Water extends Mesh {
   }
 
   createMirror(normalSampler) {
-    this.material.uniforms.mirrorSampler.value = this.renderTarget.texture
     this.material.uniforms.normalSampler.value = normalSampler
+    this.material.uniforms.depthSampler.value = this.depthRenderTarget.texture
+    this.material.uniforms.mirrorSampler.value = this.mirrorRenderTarget.texture
 
     const mirrorCamera = new PerspectiveCamera() // 镜像相机
     const mirrorPlane = new Plane() // 镜像屏幕
@@ -185,15 +203,25 @@ export default class Water extends Mesh {
       renderer.xr.enabled = false // Avoid camera modification and recursion
       renderer.shadowMap.autoUpdate = false // Avoid re-computing shadows
 
-      renderer.setRenderTarget(this.renderTarget)
+      renderer.setRenderTarget(this.mirrorRenderTarget)
 
       renderer.state.buffers.depth.setMask(true) // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
       if (renderer.autoClear === false) renderer.clear()
       renderer.render(scene, mirrorCamera)
 
+      // 渲染深度图
+      this.view.sky.lensflare.visible = false // 忽略光晕 mesh
+      scene.overrideMaterial = this.depthMaterial
+
+      renderer.setRenderTarget(this.depthRenderTarget)
+      renderer.render(scene, camera)
+
+      scene.overrideMaterial = null
+
       scope.visible = true
 
+      // Restore renderTarget
       renderer.xr.enabled = currentXrEnabled
       renderer.shadowMap.autoUpdate = currentShadowAutoUpdate
 
@@ -215,7 +243,7 @@ export default class Water extends Mesh {
   }
 
   resize(width, height) {
-    this.renderTarget.setSize(width, height)
+    this.mirrorRenderTarget.setSize(width, height)
   }
 
   update() {
@@ -230,8 +258,8 @@ export default class Water extends Mesh {
 
     const uniforms = this.material.uniforms
     uniforms.time.value = clock.elapsed
-    uniforms.uIntensity.value = sunState.intensity
-    uniforms.uWaveTexture.value = this.gpgpu.computation.getCurrentRenderTarget(this.gpgpu.waveVariable).texture
+    uniforms.intensity.value = sunState.intensity
+    uniforms.waveTexture.value = this.gpgpu.computation.getCurrentRenderTarget(this.gpgpu.waveVariable).texture
 
     this.position.set(...waterSate.position)
 
