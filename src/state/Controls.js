@@ -59,6 +59,13 @@ export default class Controls extends EventEmitter {
     window.addEventListener('pointermove', (event) => {
       this.pointer.deltaTemp.x += event.movementX
       this.pointer.deltaTemp.y += event.movementY
+
+      // 限制鼠标最大移动距离
+      if (Math.abs(this.pointer.deltaTemp.x) > this.pointer.MAX)
+        this.pointer.deltaTemp.x = Math.sign(event.movementX) * this.pointer.MAX
+      if (Math.abs(this.pointer.deltaTemp.y) > this.pointer.MAX)
+        this.pointer.deltaTemp.y = Math.sign(event.movementY) * this.pointer.MAX
+
       this.updateIdleStatus()
     })
 
@@ -140,6 +147,7 @@ export default class Controls extends EventEmitter {
     this.pointer.down = false
     this.pointer.deltaTemp = { x: 0, y: 0 }
     this.pointer.delta = { x: 0, y: 0 }
+    this.pointer.MAX = 100
   }
 
   updateIdleStatus() {
