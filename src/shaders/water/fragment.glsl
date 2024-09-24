@@ -83,7 +83,7 @@ void main() {
     float sceneDepth = depthSample * (far - near) + near;
     float diffDepth = sceneDepth - depth;
 
-    // [0, 0.1] => [0, 1]
+    // [0, 0.3] => [0, 1]
     boundry = clamp(diffDepth / .3, 0., 1.);
     boundry = surfaceNormal.x > boundry ? 1. : 0.;
   }
