@@ -13,5 +13,5 @@ float getDepth(float zNDC) {
 
 void main() {
   float depth = getDepth(vPosition.z / vPosition.w);
-  gl_FragColor = packDepthToRGBA(depth);
+  gl_FragColor = packDepthToRGBA(depth); // 将深度值编码为 RGBA 值
 }

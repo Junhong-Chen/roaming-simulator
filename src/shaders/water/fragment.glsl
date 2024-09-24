@@ -70,8 +70,7 @@ void main() {
   float intensity = smoothstep(-.5, 1.2, intensity);
 
   // 浪花
-  float spray = 1. - dot(surfaceNormal, vec3(0., 1., 0.));
-  spray = step(.1, spray);
+  float spray = surfaceNormal.x > .3 ? 1. : 0.;
 
   // 岸边
   float boundry;
@@ -80,19 +79,19 @@ void main() {
     float depth = NDCToLinear(z);
 
     vec3 pos = vPosition.xyz / vPosition.w * 0.5 + 0.5;
-    float depthSample = unpackRGBAToDepth(texture2D(depthSampler, pos.xy));
+    float depthSample = unpackRGBAToDepth(texture2D(depthSampler, pos.xy)); // 将 RGBA 值还原为深度值
     float sceneDepth = depthSample * (far - near) + near;
     float diffDepth = sceneDepth - depth;
 
     // [0, 0.1] => [0, 1]
-    boundry = clamp(diffDepth / .1, 0., 1.);
-    boundry = 1. - step(1., boundry);
+    boundry = clamp(diffDepth / .3, 0., 1.);
+    boundry = surfaceNormal.x > boundry ? 1. : 0.;
   }
 
   // 涟漪
+  float wave;
   vec2 minUv = vec2(0.5 - waveScale);
   vec2 maxUv = vec2(1.0 - minUv.x, 1.0 - minUv.y);
-  float wave;
 
   // 判断当前 UV 是否在中心区域内
   if (spray + boundry <= 0. && vUv.x > minUv.x && vUv.x < maxUv.x && vUv.y > minUv.y && vUv.y < maxUv.y) {
