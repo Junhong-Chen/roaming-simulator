@@ -67,10 +67,11 @@ void main() {
   vec4 noise = normalNoise(vWorldPosition.xz * size, time * .1);
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
-  float intensity = smoothstep(-.5, 1.2, intensity);
+  float intensity = smoothstep(.3, .75, intensity);
+  intensity = clamp(intensity, .3, .95);
 
   // 浪花
-  float spray = surfaceNormal.x > .3 ? 1. : 0.;
+  float spray = surfaceNormal.x > .4 ? 1. : 0.;
 
   // 岸边
   float boundry;
@@ -83,8 +84,8 @@ void main() {
     float sceneDepth = depthSample * (far - near) + near;
     float diffDepth = sceneDepth - depth;
 
-    // [0, 0.3] => [0, 1]
-    boundry = clamp(diffDepth / .3, 0., 1.);
+    // [0, 0.5] => [0, 1]
+    boundry = clamp(diffDepth / .5, 0., 1.);
     boundry = surfaceNormal.x > boundry ? 1. : 0.;
   }
 
