@@ -5009,10 +5009,11 @@ void main() {\r
   vec4 noise = normalNoise(vWorldPosition.xz * size, time * .1);\r
   vec3 surfaceNormal = normalize(noise.xzy * vec3(1.5, 1.0, 1.5));
 
-  float intensity = smoothstep(-.5, 1.2, intensity);
+  float intensity = smoothstep(.3, .75, intensity);\r
+  intensity = clamp(intensity, .3, .95);
 
   
-  float spray = surfaceNormal.x > .3 ? 1. : 0.;
+  float spray = surfaceNormal.x > .4 ? 1. : 0.;
 
   
   float boundry;\r
@@ -5026,7 +5027,7 @@ void main() {\r
     float diffDepth = sceneDepth - depth;
 
     
-    boundry = clamp(diffDepth / .3, 0., 1.);\r
+    boundry = clamp(diffDepth / .5, 0., 1.);\r
     boundry = surfaceNormal.x > boundry ? 1. : 0.;\r
   }
 
